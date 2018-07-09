@@ -2,25 +2,18 @@
 """
 Created on Mon Jun 11 11:28:59 2018
 
-@author: jza0069
+@author: Jack J Amend
 """
 
 '''
-Lucas-Kanade tracker
+Optical flow using openCV
 ====================
 
-Lucas-Kanade sparse optical flow demo. Uses goodFeaturesToTrack
-for track initialization and back-tracking for match verification
-between frames.
+Adapted from openCV example (https://github.com/opencv/opencv/blob/master/samples/python/lk_track.py). 
+Class file to find various points of interest and track them. Using the points, identify areas as
+occupied and overlays a red rectangle on section. To stop, pres the ESC key. This file should not be run,
+instead use the controller file to keep everything nice and organized.
 
-Usage
------
-lk_track.py [<video_source>]
-
-
-Keys
-----
-ESC - exit
 '''
 
 import numpy as np
@@ -28,6 +21,7 @@ import cv2
 import time
 import matplotlib.pyplot as plt
 import os
+import math
 
 # Parameter for Lucas Kanade optical flow
 lk_params = dict( winSize  = (25, 25),
@@ -59,6 +53,8 @@ class App:
         self.rect_corners_top_bottom = []
         self.reduction = reduction
         self.setup()
+        self.fbgb = cv2.createBackgroundSubtractorMOG2()
+        ''' cv2.createBackgroundSubtractorMOG2()'''
 
     def close(self):
         if self.plotting:
@@ -111,6 +107,26 @@ class App:
                 point_list.append(tracks)
         # point_list
 
+    def good_tracks(self):
+        good_tracks = []
+        for track in self.tracks:
+            if len(track) > 8:
+                point1 = track[0]
+                point2 = track[len(track) - 1]
+                distance = self.distance(point1,point2)
+                if distance > (.05 * self.width):
+                    good_tracks.append(track)
+            else:
+                good_tracks.append(track)
+        return good_tracks
+
+    def distance(self, point1, point2):
+        x1, y1 = point1
+        x2, y2, = point2
+        x_sqrt = math.pow((x2-x1), 2)
+        y_sqrt = math.pow((y2 - y1),2)
+        return math.sqrt(x_sqrt + y_sqrt)
+
     def image_with_boxes(self, image, show_image=True):
         # If there are no points to track, return
         if len(self.tracks) <= 0:
@@ -127,6 +143,8 @@ class App:
 
     def get_coordinates_of_corners(self):
         coordinates = []
+        '''Changed good_tracks from self.tracks'''
+        # good_tracks = self.good_tracks()
         for track in self.tracks:
             # May need to adjust this line to account for past path
             # Right now, looks at most recent
@@ -190,13 +208,22 @@ class App:
 
     def setup(self):
         ret, frame = self.cam.read()
+        self.height, self.width, self.channels = frame.shape
         self.set_rect_coors(frame, self.reduction)
 
     def run(self):
         start = time.time()
         while True:
             ret, frame = self.cam.read()
+            ''' Edits for cropping video '''
+            # height, width, channels = frame.shape
+            # center_width = int(width / 2)
+            # frame = frame[int(height * .10):int(height * .90), int(center_width * .65):int(center_width * 1.35)]
+            ''' End Edits '''
             frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            '''Background subtraction Edits'''
+            # frame_gray = self.fbgb.apply(frame)
+            ''' End Edits'''
             vis = frame.copy()
 
             if len(self.tracks) > 0:
@@ -221,7 +248,9 @@ class App:
                 cv2.putText(vis, 'fps: %d' % int(self.frame_idx / (time.time()-start)), (20, 40), cv2.FONT_HERSHEY_PLAIN, 1.0, (255, 255, 255), lineType=cv2.LINE_AA)
                 cv2.putText(vis, 'total frames: %d' % int(self.frame_idx), (20, 60), cv2.FONT_HERSHEY_PLAIN,
                         1.0, (255, 255, 255), lineType=cv2.LINE_AA)
-
+            print('before',len(self.tracks), end=' ')
+            # self.good_tracks()
+            print('after', len(self.tracks))
             # First time will evaluate as true
             if self.frame_idx % self.detect_interval == 0:
                 mask = np.zeros_like(frame_gray)
@@ -242,6 +271,7 @@ class App:
             vis = self.image_with_boxes(vis, False)
 
             if ret:
+                print(frame)
                 cv2.imshow('Drone Cam', vis)
 
             ch = 0xFF & cv2.waitKey(1)
