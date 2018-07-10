@@ -1,9 +1,18 @@
+"""
+Here we go again
+"""
 import cv2
+import threading
+
 video_src = 0
 
 cam = cv2.VideoCapture(video_src)
 
 fgbg = cv2.createBackgroundSubtractorMOG2()
+
+
+
+
 
 while True:
     ret, frame = cam.read()
@@ -20,9 +29,11 @@ while True:
     ch = 0xFF & cv2.waitKey(1)
     if ch == 27:
         break
-    elif ch == 32:
-        for var in fgmask:
-            print(var)
+    # elif ch == 32:
+    #     for var in fgmask:
+    #         for value in var:
+    #             print(value, end=' ')
+    #         print('\n')
 
 cam.release()
 cv2.destroyAllWindows()
