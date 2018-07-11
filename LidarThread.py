@@ -3,11 +3,12 @@ import lidar_lite as lidar
 
 class LidarThread(threading.Thread):
 
-    def __init__(self, lidar: lidar, high_value_q: queue.Queue):
+    def __init__(self, high_value_q: queue.Queue):
         super(LidarThread, self).__init__()
         self.stop_request = threading.Event()
         self.high_value_q = high_value_q
-        self.lidar = lidar
+        self.lidar = lidar()
+        self.lidar.setThreshold(100)
 
     def run(self):
         while not self.stop_request.isSet():

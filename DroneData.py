@@ -5,6 +5,7 @@ import cv2
 from PiFrameThread import PiFrameThread
 from AnalyzeThread import AnalyzeThread
 from OverlayThread import OverlayThread
+from LidarThread import LidarThread
 
 
 class DroneData:
@@ -13,7 +14,9 @@ class DroneData:
         self.frame_q = queue.Queue()
         self.analyze_q = queue.Queue()
         self.overlay_q = queue.Queue()
+        self.lidar_q = queue.Queue()
 
+        self.lidar = LidarThread()
         self.pi_frame = PiFrameThread(self.frame_q)
         self.analyze = AnalyzeThread(self.frame_q, self.analyze_q)
         self.overlay = OverlayThread(self.analyze_q, self.overlay_q,
