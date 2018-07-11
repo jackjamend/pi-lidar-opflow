@@ -9,11 +9,11 @@ Created on Mon Jun 11 11:28:59 2018
 Optical flow using openCV
 ====================
 
-Adapted from openCV example 
-(https://github.com/opencv/opencv/blob/master/samples/python/lk_track.py). 
-Class file to find various points of interest and track them. Using the points, 
-identify areas as occupied and overlays a red rectangle on section. To stop, 
-press the ESC key. This file should not be run, instead use the controller 
+Adapted from openCV example
+(https://github.com/opencv/opencv/blob/master/samples/python/lk_track.py).
+Class file to find various points of interest and track them. Using the points,
+identify areas as occupied and overlays a red rectangle on section. To stop,
+press the ESC key. This file should not be run, instead use the controller
 file to keep everything nice and organized.
 '''
 
