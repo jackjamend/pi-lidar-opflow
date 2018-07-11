@@ -15,9 +15,15 @@ from adv_opt_flow import App
 
 
 def main():
+<<<<<<< HEAD
     # video_src = "car.mp4"
     # video_src = "tcp://192.168.1.1:5555"
     video_src = 0
+=======
+    video_src = "car.mp4"
+    # video_src = "tcp://192.168.1.1:5555"
+    # video_src = 0
+>>>>>>> c1201e31185cc1ebbd9d2e974f87a7fca5dd0610
     try:
         app = App(video_src, plot_graphs=False, full_track=True, reduction=8)
         app.run()
