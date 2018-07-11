@@ -43,7 +43,7 @@ function move(f,b,l,r){
   client.right(r);
   client.front(f);
   client.back(b);
-
+  client.stop();
 }
 
 setTimeout(function(){}, 3000);
