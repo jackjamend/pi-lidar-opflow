@@ -12,8 +12,6 @@ fgbg = cv2.createBackgroundSubtractorMOG2()
 
 
 
-
-
 while True:
     ret, frame = cam.read()
     height, width, channels = frame.shape
