@@ -58,9 +58,7 @@ class AnalyzeThread(threading.Thread):
                     self.tracks = new_tracks
                     cv2.polylines(vis, [np.int32(tr) for tr in self.tracks],
                                  False, (0, 255, 0))
-                    cv2.putText(vis, 'track count: %d' % len(self.tracks),
-                                (20, 20), cv2.FONT_HERSHEY_PLAIN, 1.0,
-                                (255, 255, 255), lineType=cv2.LINE_AA)
+
 
                 if self.frame_idx % self.detect_interval == 0:
                     mask = np.zeros_like(frame_gray)

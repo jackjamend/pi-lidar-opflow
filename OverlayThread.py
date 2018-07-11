@@ -29,13 +29,13 @@ class OverlayThread(threading.Thread):
     '''Set up the cordinates for the top left of rectangles and bottom 
     right.'''
 
-    def set_rect_coors(self, frame, reduction):
-        rect_coords = self.rect_coordinates(frame, reduction)
+    def set_rect_coors(self, resolution, reduction):
+        rect_coords = self.rect_coordinates(resolution, reduction)
         rect_corners = self.rect_corners(rect_coords)
         return rect_corners
 
-    def rect_coordinates(self, image, reduction):
-        width, height = image.shape
+    def rect_coordinates(self, resolution, reduction):
+        width, height = resolution
         x_points = []
         y_points = []
         for i in range(reduction + 1):

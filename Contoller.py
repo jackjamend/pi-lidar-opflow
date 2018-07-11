@@ -19,8 +19,8 @@ def main():
         drone_data = DroneData((640,480), 8)
         drone_data.run()
         drone_data.close()
-    except AttributeError:
-        print("Whoops! You forgot to switch the WiFi again :/")
+    # except AttributeError:
+    #     print("Whoops! You forgot to switch the WiFi again :/")
     except KeyboardInterrupt:
         print("Keyboard Interruption. Closing app")
         drone_data.close()

@@ -74,8 +74,9 @@ class App:
         self.lidar_q = queue.Queue()
         self.lidar = lidar()
         self.lidar.setThreshold(100)
-        self.lidar_thread = LidarThread(self.lidar, self.lidar_q)
+        self.lidar_thread = LidarThread(self.lidar_q)
         self.lidar_thread.start()
+        self.fgbg = cv2.bgsegm.createBackgroundSubtractorMOG()
         self.setup()
 
     def close(self):
@@ -256,7 +257,7 @@ class App:
             ''' End Edits '''
             frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
             '''Background subtraction Edits'''
-            frame_gray = self.fbgb.apply(frame)
+            frame_gray = self.fgbg.apply(frame)
             ''' End Edits'''
             vis = frame.copy()
 
@@ -268,7 +269,7 @@ class App:
                 print("There is an object within the threshold distance of "
                       "the drone")
                 with self.lidar_q.mutex:
-                    self.lidar_q.clear()
+                    self.lidar_q.queue.clear()
 
             if len(self.tracks) > 0:
                 img0, img1 = self.prev_gray, frame_gray

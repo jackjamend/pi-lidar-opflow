@@ -20,8 +20,7 @@ class DroneData:
         self.analyze = AnalyzeThread(self.frame_q, self.analyze_q)
         self.overlay = OverlayThread(self.analyze_q, self.overlay_q,
                                      resolution, reduction)
-        self.threads = [self.lidar_q, self.pi_frame, self.analyze,
-                        self.overlay]
+        self.threads = [self.lidar, self.pi_frame, self.analyze, self.overlay]
 
     def run(self):
         self.pi_frame.start()
@@ -32,7 +31,7 @@ class DroneData:
         self.lidar.start()
         while True:
             if not self.overlay_q.empty():
-                frame = self.overay_q.get()
+                frame = self.overlay_q.get()
                 cv2.putText(frame,
                             'Total frames in frame_q: %d' %
                             self.frame_q.qsize(),(20, 20),
@@ -56,7 +55,7 @@ class DroneData:
             if not self.lidar_q.empty():
                 print("Object within lidar threshold")
                 with self.lidar_q.mutex:
-                    self.lidar_q.clear()
+                    self.lidar_q.queue.clear()
 
             ch = 0xFF & cv2.waitKey(1)
             if ch == 27:

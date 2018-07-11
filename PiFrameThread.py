@@ -1,5 +1,6 @@
 import threading
 import queue
+import time
 from picamera.array import PiRGBArray
 from picamera import PiCamera
 
@@ -23,6 +24,7 @@ class PiFrameThread(threading.Thread):
                 frame = image.array
                 self.frame_q.put(frame)
                 self.rawCapture.truncate(0)
+                time.sleep(.1)
 
     def join(self, timeout=None):
         self.stop_request.set()
