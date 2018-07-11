@@ -1,4 +1,5 @@
-import threading, queue
+import threading
+import queue
 from picamera.array import PiRGBArray
 from picamera import PiCamera
 
