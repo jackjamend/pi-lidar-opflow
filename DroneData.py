@@ -92,16 +92,18 @@ class DroneData:
         print('Closed')
 
     def yaw(self):
-        if self.overlay.travel_zone == 0:
+        max_movement = np.unravel_index(np.argmax(self.overlay),
+                                        self.overlay.shape)
+        if max_movement[0] < 3:
             print('left')
-        elif self.overlay.travel_zone == 2:
+        elif max_movement[0] > 4:
             print('right')
 
     def move(self):
-        direcetion = self.overlay.travel_zone
-        if direcetion == 1:
+        direction = self.overlay.travel_zone
+        if direction == 1:
             print(0)
-        elif direcetion == 2:
+        elif direction == 2:
             print(30)
-        elif direcetion == 0:
+        elif direction == 0:
             print(330)
