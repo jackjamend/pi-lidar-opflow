@@ -28,13 +28,13 @@ py.stdout.on('data', function(data){
       move(Math.cos(rads),0,0,Math.sin(rads));
       console.log(ev);
     } else if (ev>90 & ev<=180){
-      move(0,abs(Math.cos(rads)),0,Math.sin(rads));
+      move(0,Math.abs(Math.cos(rads)),0,Math.sin(rads));
       console.log(ev);
     } else if (ev>180 & ev<=270){
-      move(0,abs(Math.cos(rads)),abs(Math.sin(rads)),0);
+      move(0,Math.abs(Math.cos(rads)),Math.abs(Math.sin(rads)),0);
       console.log(ev);
     } else if (ev>270 & ev<=360){
-      move(Math.cos(rads),0,abs(Math.sin(rads)),0);
+      move(Math.cos(rads),0,Math.abs(Math.sin(rads)),0);
       console.log(ev);
     }
   }
