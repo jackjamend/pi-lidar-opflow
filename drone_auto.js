@@ -1,5 +1,5 @@
 const spawn = require('child_process').spawn;
-const py = spawn('python', ['newtest.py']);
+const py = spawn('python3', ['Contoller.py']);
 var ev = '';
 //const readline = require('readline')
 //readline.emitKeypressEvents(process.stdin);
