@@ -2,7 +2,7 @@ import queue
 import time
 import cv2
 import numpy as np
-from termcolor import colored
+# from termcolor import colored
 
 from PiFrameThread import PiFrameThread
 from AnalyzeThread import AnalyzeThread
@@ -44,13 +44,13 @@ class DroneData:
                 if self.verbose:
                     display = ['Total frames in frame_q: %d' %
                                self.frame_q.qsize(),
-                               'Totalframes in analyze_q: %d' %
+                               'Total frames in analyze_q: %d' %
                                self.analyze_q.qsize(),
-                                'Total frames in overlay_q: %d' %
+                               'Total frames in overlay_q: %d' %
                                self.overlay_q.qsize()]
-                    for str in display:
+                    for value in display:
                         cv2.putText(frame,
-                                    str, (20, 20 * (display.index(str)+1)),
+                                    value, (20, 20 * (display.index(value)+1)),
                                     cv2.FONT_HERSHEY_PLAIN, 1.0,
                                     (255, 255, 255),
                                     lineType=cv2.LINE_AA)
@@ -59,16 +59,16 @@ class DroneData:
                         cv2.putText(frame,
                                     'Current LiDAR Distance: %d' %
                                     self.lidar.get_current(), (20, 80),
-                                    cv2.FONT_HERSHEY_PLAIN, 1.0, (255, 255, 255),
-                                    lineType=cv2.LINE_AA)
+                                    cv2.FONT_HERSHEY_PLAIN, 1.0,
+                                    (255, 255, 255), lineType=cv2.LINE_AA)
                 self.yaw()
                 try:
                     cv2.imshow("Camera Feed", frame)
                 except cv2.error:
-                    print("Whoops, cv2 error!")
+                    # print("Whoops, cv2 error!")
                     pass
             if not self.lidar_q.empty():
-                print(colored("Object within LiDAR threshold", 'yellow'))
+                # print(colored("Object within LiDAR threshold", 'yellow'))
                 self.move()
                 with self.lidar_q.mutex:
                     self.lidar_q.queue.clear()
@@ -78,7 +78,7 @@ class DroneData:
                 break
 
     def close(self):
-        print(self.overlay.history)
+        # print(self.overlay.history)
         self.kill_threads()
 
     def kill_threads(self):
@@ -95,15 +95,15 @@ class DroneData:
         max_movement = np.unravel_index(np.argmax(self.lookup),
                                         self.lookup.shape)
         if max_movement[0] < 3:
-            print('left')
+            print('left', flush=True)
         elif max_movement[0] > 4:
-            print('right')
+            print('right', flush=True)
 
     def move(self):
         direction = self.overlay.travel_zone
         if direction == 1:
-            print(0)
+            print(0, flush=True)
         elif direction == 2:
-            print(30)
+            print(30, flush=True)
         elif direction == 0:
-            print(330)
+            print(330, flush=True)
