@@ -8,16 +8,18 @@ colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255)]
 
 class OverlayThread(threading.Thread):
     def __init__(self, analyze_q: queue.Queue, overlay_q: queue.Queue,
-                 resolution, reduction):
-        super(OverlayThread, self).__init__()
+                 resolution, reduction, name):
+        super(OverlayThread, self).__init__(name=name)
         self.stop_request = threading.Event()
         self.analyze_q = analyze_q
         self.overlay_q = overlay_q
         self.reduction = reduction
         self.resolution = resolution
-        self.dx = resolution[0]//reduction
-        self.dy = resolution[0] // reduction
+        self.dx = resolution[0]// reduction
+        self.dy = resolution[1] // reduction
         self.lookup = np.zeros((reduction,reduction))
+        self.history = np.zeros((reduction,reduction))
+        self.travel_zone = 1
 
     def run(self):
 
@@ -27,8 +29,9 @@ class OverlayThread(threading.Thread):
                 frame, tracks = self.analyze_q.get()
                 output = self.image_with_boxes(frame, tracks, show_image=False)
                 self.overlay_q.put(output)
-                print('Overlay thread ran for %.2f seconds and %d tracks' %
-                      ((time.time()-start), len(tracks)))
+                self.find_zone()
+                # print('Overlay thread ran for %.2f seconds and %d tracks' %
+                #       ((time.time()-start), len(tracks)))
 
     def join(self, timeout=None):
         self.stop_request.set()
@@ -88,4 +91,14 @@ class OverlayThread(threading.Thread):
                               colors[2], -1)
         alpha = .4
         cv2.addWeighted(overlay, alpha, image, 1 - alpha, 0, image)
-        self.lookup = np.zeros((self.reduction,self.reduction))
+
+
+    def find_zone(self):
+        # print(self.lookup)
+        tran = np.transpose(self.lookup)
+        zones = np.split(tran, [3, 5])
+        score = []
+        for zone in zones:
+            score.append(np.sum(zone) / np.size(zone))
+        self.travel_zone = np.argmin(score)
+        self.lookup = np.zeros((self.reduction, self.reduction))

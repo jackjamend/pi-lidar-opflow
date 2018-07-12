@@ -1,6 +1,7 @@
 import threading
 import queue
 import cv2
+import time
 import numpy as np
 
 lk_params = dict( winSize  = (25, 25),
@@ -26,13 +27,16 @@ class AnalyzeThread(threading.Thread):
         self.detect_interval = 10
         self.tracks = []
         self.frame_idx = 0
+        # self.fgbg = cv2.bgsegm.createBackgroundSubtractorMOG()
 
     def run(self):
         while not self.stop_request.isSet():
             if not self.frame_q.empty():
+                start = time.time()
                 frame = self.frame_q.get()
                 frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
                 vis = frame.copy()
+                # vis = self.fgbg.apply(frame)
 
                 if len(self.tracks) > 0:
                     img0, img1 = self.prev_gray, frame_gray
@@ -75,6 +79,8 @@ class AnalyzeThread(threading.Thread):
                 self.prev_gray = frame_gray
 
                 self.analyze_q.put((vis, self.tracks))
+                print('Analyze thread ran for %.2f seconds' %
+                      (time.time()-start))
 
 
     def join(self, timeout=None):

@@ -1,6 +1,7 @@
 import queue
 import time
 import cv2
+from termcolor import colored
 
 from PiFrameThread import PiFrameThread
 from AnalyzeThread import AnalyzeThread
@@ -19,9 +20,12 @@ class DroneData:
         self.pi_frame = PiFrameThread(self.frame_q)
         self.analyze = AnalyzeThread(self.frame_q, self.analyze_q)
         self.overlay = OverlayThread(self.analyze_q, self.overlay_q,
-                                     resolution, reduction)
+                                     resolution=resolution, reduction=reduction,
+                                     name='overlay')
         self.overlay2 = OverlayThread(self.analyze_q, self.overlay_q,
-                                     resolution, reduction)
+                                      resolution=resolution,
+                                      reduction=reduction,
+                                      name='overlay2')
         self.threads = [self.lidar, self.pi_frame, self.analyze,
                         self.overlay, self.overlay2]
 
@@ -37,12 +41,12 @@ class DroneData:
                 frame = self.overlay_q.get()
                 cv2.putText(frame,
                             'Total frames in frame_q: %d' %
-                            self.frame_q.qsize(),(20, 20),
+                            self.frame_q.qsize(), (20, 20),
                             cv2.FONT_HERSHEY_PLAIN, 1.0, (255,255,255),
                             lineType=cv2.LINE_AA)
                 cv2.putText(frame,
                             'Total frames in analyze_q: %d' %
-                            self.analyze_q.qsize(),(20, 40),
+                            self.analyze_q.qsize(), (20, 40),
                             cv2.FONT_HERSHEY_PLAIN, 1.0, (255, 255,255),
                             lineType=cv2.LINE_AA)
                 cv2.putText(frame,
@@ -50,13 +54,20 @@ class DroneData:
                             self.overlay_q.qsize(), (20, 60),
                             cv2.FONT_HERSHEY_PLAIN, 1.0, (255, 255, 255),
                             lineType=cv2.LINE_AA)
+                if self.lidar.current_value is not None:
+                    cv2.putText(frame,
+                                'Current LiDAR Distance: %d' %
+                                self.lidar.get_current(), (20, 80),
+                                cv2.FONT_HERSHEY_PLAIN, 1.0, (255, 255, 255),
+                                lineType=cv2.LINE_AA)
+
                 try:
                     cv2.imshow("Camera Feed", frame)
                 except cv2.error:
                     print("Whoops, cv2 error!")
                     pass
             if not self.lidar_q.empty():
-                print("Object within lidar threshold")
+                print(colored("Object within LiDAR threshold", 'yellow'))
                 with self.lidar_q.mutex:
                     self.lidar_q.queue.clear()
 
