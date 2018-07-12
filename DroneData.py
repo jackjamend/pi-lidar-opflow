@@ -21,8 +21,8 @@ class DroneData:
         self.analyze = AnalyzeThread(self.frame_q, self.analyze_q,
                                      name='analyze')
         self.overlay = OverlayThread(self.analyze_q, self.overlay_q,
-                                     resolution=resolution, reduction=reduction,
-                                     name='overlay')
+                                     resolution=resolution,
+                                     reduction=reduction, name='overlay')
         self.threads = [self.lidar, self.pi_frame, self.analyze,
                         self.overlay]
         for thread in self.threads:
