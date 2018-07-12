@@ -46,3 +46,30 @@ print(np.argmin(score))
 #         break
 #
 # cv2.destroyAllWindows()
+
+class frame():
+
+    def __init__(self):
+        qsize = 10
+
+    def qsize(self):
+        return self.qsize
+
+    def set(self, num):
+        self.qsize = num
+
+frame_q = frame()
+analyze_q = frame()
+overlay_q = frame()
+
+
+
+
+arr = ['Total frames in frame_q: %d' % frame_q.qsize(),
+       'Totalframes in analyze_q: %d' % analyze_q.qsize(),
+       'Total frames in overlay_q: %d' % overlay_q.qsize()]
+
+frame_q.set
+
+print(arr)
+

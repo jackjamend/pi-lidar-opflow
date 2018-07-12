@@ -23,15 +23,12 @@ class DroneData:
         self.overlay = OverlayThread(self.analyze_q, self.overlay_q,
                                      resolution=resolution, reduction=reduction,
                                      name='overlay')
-        # self.overlay2 = OverlayThread(self.analyze_q, self.overlay_q,
-        #                               resolution=resolution,
-        #                               reduction=reduction,
-        #                               name='overlay2')
         self.threads = [self.lidar, self.pi_frame, self.analyze,
                         self.overlay]
         for thread in self.threads:
             thread.setDaemon(True)
         self.lookup = []
+        self.verbose = True
 
     def run(self):
         self.pi_frame.start()
@@ -39,32 +36,30 @@ class DroneData:
         self.analyze.start()
         time.sleep(.1)
         self.overlay.start()
-        time.sleep(.1)
         self.lidar.start()
         while True:
             if not self.overlay_q.empty():
                 frame, self.lookup = self.overlay_q.get()
-                cv2.putText(frame,
-                            'Total frames in frame_q: %d' %
-                            self.frame_q.qsize(), (20, 20),
-                            cv2.FONT_HERSHEY_PLAIN, 1.0, (255,255,255),
-                            lineType=cv2.LINE_AA)
-                cv2.putText(frame,
-                            'Total frames in analyze_q: %d' %
-                            self.analyze_q.qsize(), (20, 40),
-                            cv2.FONT_HERSHEY_PLAIN, 1.0, (255, 255,255),
-                            lineType=cv2.LINE_AA)
-                cv2.putText(frame,
-                            'Total frames in overlay_q: %d' %
-                            self.overlay_q.qsize(), (20, 60),
-                            cv2.FONT_HERSHEY_PLAIN, 1.0, (255, 255, 255),
-                            lineType=cv2.LINE_AA)
-                if self.lidar.current_value is not None:
-                    cv2.putText(frame,
-                                'Current LiDAR Distance: %d' %
-                                self.lidar.get_current(), (20, 80),
-                                cv2.FONT_HERSHEY_PLAIN, 1.0, (255, 255, 255),
-                                lineType=cv2.LINE_AA)
+                if self.verbose:
+                    display = ['Total frames in frame_q: %d' %
+                               self.frame_q.qsize(),
+                               'Totalframes in analyze_q: %d' %
+                               self.analyze_q.qsize(),
+                                'Total frames in overlay_q: %d' %
+                               self.overlay_q.qsize()]
+                    for str in display:
+                        cv2.putText(frame,
+                                    str, (20, 20 * (display.index(str)+1)),
+                                    cv2.FONT_HERSHEY_PLAIN, 1.0,
+                                    (255, 255, 255),
+                                    lineType=cv2.LINE_AA)
+
+                    if self.lidar.current_value is not None:
+                        cv2.putText(frame,
+                                    'Current LiDAR Distance: %d' %
+                                    self.lidar.get_current(), (20, 80),
+                                    cv2.FONT_HERSHEY_PLAIN, 1.0, (255, 255, 255),
+                                    lineType=cv2.LINE_AA)
 
                 try:
                     cv2.imshow("Camera Feed", frame)
