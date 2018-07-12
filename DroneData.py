@@ -1,6 +1,7 @@
 import queue
 import time
 import cv2
+import numpy as np
 from termcolor import colored
 
 from PiFrameThread import PiFrameThread
@@ -60,7 +61,7 @@ class DroneData:
                                     self.lidar.get_current(), (20, 80),
                                     cv2.FONT_HERSHEY_PLAIN, 1.0, (255, 255, 255),
                                     lineType=cv2.LINE_AA)
-
+                self.yaw()
                 try:
                     cv2.imshow("Camera Feed", frame)
                 except cv2.error:
@@ -68,6 +69,7 @@ class DroneData:
                     pass
             if not self.lidar_q.empty():
                 print(colored("Object within LiDAR threshold", 'yellow'))
+                self.move()
                 with self.lidar_q.mutex:
                     self.lidar_q.queue.clear()
 
@@ -88,3 +90,18 @@ class DroneData:
             else:
                 print('Thread %s not closed!' % thread.getName())
         print('Closed')
+
+    def yaw(self):
+        if self.overlay.travel_zone == 0:
+            print('left')
+        elif self.overlay.travel_zone == 2:
+            print('right')
+
+    def move(self):
+        direcetion = self.overlay.travel_zone
+        if direcetion == 1:
+            print(0)
+        elif direcetion == 2:
+            print(30)
+        elif direcetion == 0:
+            print(330)
