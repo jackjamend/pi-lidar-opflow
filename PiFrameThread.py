@@ -7,8 +7,8 @@ from picamera import PiCamera
 
 class PiFrameThread(threading.Thread):
     def __init__(self, frame_q: queue.Queue,
-                 resolution=(640, 480), framerate=32):
-        super(PiFrameThread, self).__init__()
+                 resolution=(640, 480), framerate=32, name=None):
+        super(PiFrameThread, self).__init__(name=name)
         self.stop_request = threading.Event()
         self.camera = PiCamera()
         self.camera.resolution = resolution

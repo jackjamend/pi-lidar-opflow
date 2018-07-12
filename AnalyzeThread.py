@@ -16,8 +16,9 @@ feature_params = dict( maxCorners = 50,
 
 class AnalyzeThread(threading.Thread):
 
-    def __init__(self, frame_q: queue.Queue, analyze_q: queue.Queue):
-        super(AnalyzeThread, self).__init__()
+    def __init__(self, frame_q: queue.Queue, analyze_q: queue.Queue,
+                 name=None):
+        super(AnalyzeThread, self).__init__(name=name)
         self.stop_request = threading.Event()
         self.frame_q =  frame_q
         self.analyze_q = analyze_q
@@ -81,7 +82,6 @@ class AnalyzeThread(threading.Thread):
                 self.analyze_q.put((vis, self.tracks))
                 print('Analyze thread ran for %.2f seconds' %
                       (time.time()-start))
-
 
     def join(self, timeout=None):
         self.stop_request.set()

@@ -16,9 +16,10 @@ class DroneData:
         self.overlay_q = queue.Queue()
         self.lidar_q = queue.Queue()
 
-        self.lidar = LidarThread(self.lidar_q)
-        self.pi_frame = PiFrameThread(self.frame_q)
-        self.analyze = AnalyzeThread(self.frame_q, self.analyze_q)
+        self.lidar = LidarThread(self.lidar_q, name='lidar')
+        self.pi_frame = PiFrameThread(self.frame_q, name='pi_frame')
+        self.analyze = AnalyzeThread(self.frame_q, self.analyze_q,
+                                     name='analyze')
         self.overlay = OverlayThread(self.analyze_q, self.overlay_q,
                                      resolution=resolution, reduction=reduction,
                                      name='overlay')
@@ -28,6 +29,7 @@ class DroneData:
         #                               name='overlay2')
         self.threads = [self.lidar, self.pi_frame, self.analyze,
                         self.overlay]
+        self.lookup = []
 
     def run(self):
         self.pi_frame.start()
@@ -38,7 +40,7 @@ class DroneData:
         self.lidar.start()
         while True:
             if not self.overlay_q.empty():
-                frame = self.overlay_q.get()
+                frame, self.lookup = self.overlay_q.get()
                 cv2.putText(frame,
                             'Total frames in frame_q: %d' %
                             self.frame_q.qsize(), (20, 20),
@@ -80,7 +82,7 @@ class DroneData:
         print('Closing threads...')
         for thread in self.threads:
             thread.join()
-            print('Thread closed!')
+            print('Thread %s closed!' % thread.getName())
         for thread in self.threads:
             if not thread.is_alive():
                 print('A thread is still alive')

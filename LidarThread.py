@@ -3,8 +3,8 @@ from lidar_lite import Lidar_Lite as lidar
 
 class LidarThread(threading.Thread):
 
-    def __init__(self, high_value_q: queue.Queue):
-        super(LidarThread, self).__init__()
+    def __init__(self, high_value_q: queue.Queue, name=None):
+        super(LidarThread, self).__init__(name=name)
         self.stop_request = threading.Event()
         self.high_value_q = high_value_q
         self.lidar = lidar()

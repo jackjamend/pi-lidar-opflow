@@ -8,7 +8,7 @@ colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255)]
 
 class OverlayThread(threading.Thread):
     def __init__(self, analyze_q: queue.Queue, overlay_q: queue.Queue,
-                 resolution, reduction, name):
+                 resolution, reduction, name=None):
         super(OverlayThread, self).__init__(name=name)
         self.stop_request = threading.Event()
         self.analyze_q = analyze_q
@@ -25,10 +25,10 @@ class OverlayThread(threading.Thread):
 
         while not self.stop_request.isSet():
             while not self.analyze_q.empty():
-                start = time.time()
+                # start = time.time()
                 frame, tracks = self.analyze_q.get()
                 output = self.image_with_boxes(frame, tracks, show_image=False)
-                self.overlay_q.put(output)
+                self.overlay_q.put((output, self.lookup))
                 self.find_zone()
                 self.history *= .95
                 # print('Overlay thread ran for %.2f seconds and %d tracks' %
