@@ -1,9 +1,11 @@
 const spawn = require('child_process').spawn;
 const py = spawn('python3', ['Controller.py']);
+
+const speed = 0.3;
 var ev = '';
-//const readline = require('readline')
-//readline.emitKeypressEvents(process.stdin);
-//process.stdin.setRawMode(true);
+const readline = require('readline')
+readline.emitKeypressEvents(process.stdin);
+process.stdin.setRawMode(true);
 
 var arDrone = require('ar-drone');
 console.log("ar drone made");
@@ -21,7 +23,9 @@ py.stdout.on('data', function(data){
   } else if(ev == "right"){
     client.clockwise(0.5);
     client.stop();
-  } else{
+  } else if(ev=="Finished!"){
+    process.exit()
+  } else {
       rads = ev*(Math.PI/180)
       console.log(ev);
       if(ev>=0 & ev<=90){
@@ -52,6 +56,86 @@ function move(f,b,l,r){
   client.front(f);
   client.back(b);
   client.stop();
+}
+
+process.stdin.on('keypress', (str, key) => {
+  if (key.ctrl && key.name === 'c') {
+    client.stop();
+    client.land();
+    process.exit();
+  } else {
+    try {
+      keyReturn(str, key);
+    } catch (error) {
+      console.error(error);
+      client.stop();
+      client.land();
+    }
+  }
+});
+
+function keyReturn(str, key) {
+  if (key.name === 'w') {
+    up = client.up(speed);
+    console.log('Move Up',up);
+  } else if (key.name === 'a') {
+    conter_clockwise = client.clockwise(-speed);
+    console.log('Turn Counter-Clockwise', Math.abs(conter_clockwise));
+  } else if (key.name === 'd') {
+    clockwise = client.clockwise(speed);
+    console.log('Turn Clockwise', clockwise);
+  } else if (key.name === 's') {
+    down = client.down(speed);
+    console.log('Move Down', down);
+  } else if (key.name === 'c') {
+    // pngStream = client.getPngStream();
+    // pngStream.on('data', console.log);
+    // console.log('Png Stream', pngStream);
+  } else if (key.name === 'v') {
+    video = client.getVideoStream();
+    video.on('data', console.log);
+    console.log('Video', video);
+  } else if (key.name === 'space') {
+    stop = client.stop();
+    console.log('Stop', stop);
+  } else if (key.name === 'escape') {
+    land = client.land();
+    console.log('Land', land);
+    py.kill('SIGINT');
+  } else if (key.name === 'tab') {
+    takeoff = client.takeoff();
+    console.log('Take Off',takeoff);
+  } else if (key.name === 'return') {
+    data = client.on('navdata', console.log);
+    console.log('Data', data);
+  } else if (key.code === '[A') {
+    front = client.front(speed);
+    console.log('Move Forward', front);
+  } else if (key.code === '[B') {
+    back = client.back(speed);
+    console.log('Move Backward', back);
+  } else if (key.code === '[C') {
+    right = client.right(speed);
+    console.log('Move Right', right);
+  } else if (key.code === '[D') {
+    left = client.left(speed);
+    console.log('Move Left', left);
+  } else {
+    console.log(`str: ${str}`);
+    console.log(key);
+  }
+}
+
+function landDrone() {
+  client.land();
+  console.log('Drone landing');
+}
+
+function getInfo(str, key) {
+  console.log(`You pressed the ${str} key`);
+  console.log();
+  console.log(key);
+  console.log();
 }
 
 console.log("starting program");

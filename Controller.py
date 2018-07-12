@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from DroneData import DroneData
+import time
 """
 Created on Fri Jun 15 12:08:30 2018
 
@@ -24,6 +25,7 @@ def main():
     except KeyboardInterrupt:
         print("Keyboard Interruption. Closing app")
         drone_data.close()
+
 
 
 if __name__ == '__main__':

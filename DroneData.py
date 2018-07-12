@@ -62,11 +62,11 @@ class DroneData:
                                     cv2.FONT_HERSHEY_PLAIN, 1.0,
                                     (255, 255, 255), lineType=cv2.LINE_AA)
                 self.yaw()
-                try:
-                    cv2.imshow("Camera Feed", frame)
-                except cv2.error:
-                    # print("Whoops, cv2 error!")
-                    pass
+                # try:
+                #     cv2.imshow("Camera Feed", frame)
+                # except cv2.error:
+                #     # print("Whoops, cv2 error!")
+                #     pass
             if not self.lidar_q.empty():
                 # print(colored("Object within LiDAR threshold", 'yellow'))
                 self.move()
