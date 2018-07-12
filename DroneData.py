@@ -92,8 +92,8 @@ class DroneData:
         print('Closed')
 
     def yaw(self):
-        max_movement = np.unravel_index(np.argmax(self.overlay),
-                                        self.overlay.shape)
+        max_movement = np.unravel_index(np.argmax(self.lookup),
+                                        self.lookup.shape)
         if max_movement[0] < 3:
             print('left')
         elif max_movement[0] > 4:
