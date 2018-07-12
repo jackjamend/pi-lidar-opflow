@@ -1,4 +1,4 @@
-import cv2
+# import cv2
 import numpy as np
 
 # cam = cv2.VideoCapture(0)
@@ -14,8 +14,9 @@ lookup[3][2] = 1
 lookup[5][2] = 1
 lookup[5][7] = 1
 lookup[4][4] = 1
-# print(lookup)
-
+print(lookup)
+lookup *= .95
+print(lookup)
 
 # zone1, zone2, zone3, = np.split(tran, [3, 5])
 tran = np.transpose(lookup)

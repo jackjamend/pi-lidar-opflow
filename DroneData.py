@@ -22,12 +22,12 @@ class DroneData:
         self.overlay = OverlayThread(self.analyze_q, self.overlay_q,
                                      resolution=resolution, reduction=reduction,
                                      name='overlay')
-        self.overlay2 = OverlayThread(self.analyze_q, self.overlay_q,
-                                      resolution=resolution,
-                                      reduction=reduction,
-                                      name='overlay2')
+        # self.overlay2 = OverlayThread(self.analyze_q, self.overlay_q,
+        #                               resolution=resolution,
+        #                               reduction=reduction,
+        #                               name='overlay2')
         self.threads = [self.lidar, self.pi_frame, self.analyze,
-                        self.overlay, self.overlay2]
+                        self.overlay]
 
     def run(self):
         self.pi_frame.start()
@@ -76,9 +76,12 @@ class DroneData:
                 break
 
     def close(self):
+        print(self.overlay.history)
+        print('Closing threads...')
         for thread in self.threads:
             thread.join()
-            time.sleep(.5)
+            print('Thread closed!')
         for thread in self.threads:
             if not thread.is_alive():
                 print('A thread is still alive')
+        print('Closed')
