@@ -17,6 +17,7 @@ def main():
 
     try:
         drone_data = DroneData((640, 480), 8)
+        drone_data.verbose = True
         drone_data.run()
         print('Program ending')
         drone_data.close()
