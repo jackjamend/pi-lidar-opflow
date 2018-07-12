@@ -14,9 +14,10 @@ lookup[3][2] = 1
 lookup[5][2] = 1
 lookup[5][7] = 1
 lookup[4][4] = 1
+lookup[4][3] = 4
 print(lookup)
 lookup *= .95
-print(lookup)
+print('r', np.unravel_index(np.argmax(lookup), lookup.shape))
 
 # zone1, zone2, zone3, = np.split(tran, [3, 5])
 tran = np.transpose(lookup)

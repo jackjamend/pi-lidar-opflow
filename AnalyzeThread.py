@@ -33,7 +33,7 @@ class AnalyzeThread(threading.Thread):
     def run(self):
         while not self.stop_request.isSet():
             if not self.frame_q.empty():
-                start = time.time()
+                # start = time.time()
                 frame = self.frame_q.get()
                 frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
                 vis = frame.copy()
@@ -80,8 +80,8 @@ class AnalyzeThread(threading.Thread):
                 self.prev_gray = frame_gray
 
                 self.analyze_q.put((vis, self.tracks))
-                print('Analyze thread ran for %.2f seconds' %
-                      (time.time()-start))
+                # print('Analyze thread ran for %.2f seconds' %
+                #       (time.time()-start))
 
     def join(self, timeout=None):
         self.stop_request.set()

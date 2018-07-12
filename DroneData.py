@@ -29,6 +29,8 @@ class DroneData:
         #                               name='overlay2')
         self.threads = [self.lidar, self.pi_frame, self.analyze,
                         self.overlay]
+        for thread in self.threads:
+            thread.setDaemon(True)
         self.lookup = []
 
     def run(self):
@@ -80,11 +82,14 @@ class DroneData:
 
     def close(self):
         print(self.overlay.history)
+        self.kill_threads()
+
+    def kill_threads(self):
         print('Closing threads...')
         for thread in self.threads:
-            thread.join()
-            print('Thread %s closed!' % thread.getName())
-        for thread in self.threads:
-            if not thread.is_alive():
-                print('A thread is still alive')
+            thread.join(5)
+            if thread.is_alive():
+                print('Thread %s closed!' % thread.getName())
+            else:
+                print('Thread %s not closed!' % thread.getName())
         print('Closed')
