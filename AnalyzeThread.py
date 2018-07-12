@@ -3,14 +3,14 @@ import queue
 import cv2
 import numpy as np
 
-lk_params = dict( winSize  = (15, 15),
-                  maxLevel = 2,
+lk_params = dict( winSize  = (25, 25),
+                  maxLevel = 1,
                   criteria = (cv2.TERM_CRITERIA_EPS |
                               cv2.TERM_CRITERIA_COUNT, 10, 0.03))
-feature_params = dict( maxCorners = 500,
-                       qualityLevel = 0.3,
-                       minDistance = 7,
-                       blockSize = 7 )
+feature_params = dict( maxCorners = 50,
+                       qualityLevel = 0.5,
+                       minDistance = 10,
+                       blockSize = 5)
 
 
 class AnalyzeThread(threading.Thread):
@@ -22,8 +22,8 @@ class AnalyzeThread(threading.Thread):
         self.analyze_q = analyze_q
         self.prev_frame = None
 
-        self.track_len = 10
-        self.detect_interval = 5
+        self.track_len = 5
+        self.detect_interval = 10
         self.tracks = []
         self.frame_idx = 0
 
