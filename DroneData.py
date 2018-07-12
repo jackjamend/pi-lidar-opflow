@@ -37,6 +37,7 @@ class DroneData:
         self.analyze.start()
         time.sleep(.1)
         self.overlay.start()
+        time.sleep(.1)
         self.lidar.start()
         while True:
             if not self.overlay_q.empty():
