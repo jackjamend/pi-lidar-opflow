@@ -92,12 +92,13 @@ class DroneData:
         print('Closed')
 
     def yaw(self):
-        max_movement = np.unravel_index(np.argmax(self.lookup),
-                                        self.lookup.shape)
-        if max_movement[0] < 3:
-            print('left', flush=True)
-        elif max_movement[0] > 4:
-            print('right', flush=True)
+        if self.overlay.scores[self.overlay.travel_zone] > 1.5:
+            max_movement = np.unravel_index(np.argmax(self.lookup),
+                                            self.lookup.shape)
+            if max_movement[0] < 3:
+                print('left', flush=True)
+            elif max_movement[0] > 4:
+                print('right', flush=True)
 
     def move(self):
         direction = self.overlay.travel_zone

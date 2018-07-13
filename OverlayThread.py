@@ -20,6 +20,7 @@ class OverlayThread(threading.Thread):
         self.lookup = np.zeros((reduction,reduction))
         self.history = np.zeros((reduction,reduction))
         self.travel_zone = 1
+        self.scores = []
 
     def run(self):
 
@@ -99,8 +100,8 @@ class OverlayThread(threading.Thread):
         # print(self.lookup)
         tran = np.transpose(self.lookup)
         zones = np.split(tran, [3, 5])
-        score = []
+        self.scores = []
         for zone in zones:
-            score.append(np.sum(zone) / np.size(zone))
-        self.travel_zone = np.argmin(score)
+            self.scores.append(np.sum(zone) / np.size(zone))
+        self.travel_zone = np.argmin(self.scores)
         self.lookup = np.zeros((self.reduction, self.reduction))
