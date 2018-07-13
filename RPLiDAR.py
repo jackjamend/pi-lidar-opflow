@@ -44,42 +44,32 @@ class RPLiDAR:
                 print("Evacuate in the direction of %d degrees"
                       % evacuation_direction) # This is the safest spot
 
-
     def area_report(self, limit=100, sectors=6):
         for i, scans in enumerate(self.lidar.iter_scans()):
-            sector_space = np.zeros(sectors)
-            warning_flag = False
-
+            if i > limit:
+                break
+            sector_space = {}
             divisor = 360 / sectors
 
             for scan in scans:
                 section = math.floor(scan[1] / divisor)
-                if scan[2] < 1000:
-                    # print("Warning: object at %f degrees is too close"
-                    # % (j[1]))
-                    sector_space[section] += -math.inf
-                    warning_flag = True
-                else:
-                    sector_space[section] += scan[2]
-                if math.floor(scan[1]) % 60 == 0:
-                    section += 1
+                try:
+                    sector_space[section].append(scan[2])
+                except KeyError:
+                    sector_space[section] = np.array(scan[2])
+            print('evaluate space', self.evaluate_spcae(sector_space, sectors))
 
-            if warning_flag:
-                print(sector_space)
-                print("Object(s) are too close...")
-                free_space = max(sector_space)
-                if free_space < 1000:
-                    print(
-                        "There is nowhere safe to venture, immediate landing"
-                        " to avoid damage...")
-                    break
-                evacuation_direction = \
-                    (sector_space.index(free_space) + 1) * 60 - 30
-                print("Evacuate in the direction of %d degrees"
-                      % evacuation_direction)
+    def evaluate_spcae(self, sector_space, sectors, min_threshold=1000):
+        evaluation = []
+        for i in range(sectors):
+            section = sector_space[i]
+            evaluation.append((section, np.min(section), np.max(section),
+                               np.average(
+                section)))
+        return evaluation
 
-            if i > limit:
-                break
+
+
 
     def stop(self):
         self.lidar.stop()
