@@ -35,6 +35,7 @@ py.stdout.on('data', function(data){
       console.log("turn right")
     }
   else{
+    console.log('Math shit');
     rads = ev*(Math.PI/180)
     console.log(ev);
     if(ev>=0 & ev<=90){
