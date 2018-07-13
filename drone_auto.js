@@ -39,16 +39,24 @@ py.stdout.on('data', function(data){
     rads = ev*(Math.PI/180)
     console.log(ev);
     if(ev>=0 & ev<=90){
-      move(Math.cos(rads),0,0,Math.sin(rads));
+      client.front(Math.cos(rads));
+      client.right(Math.sin(rads));
+      //move(Math.cos(rads),0,0,Math.sin(rads));
       console.log(ev);
     }else if (ev>90 & ev<=180){
-      move(0,Math.abs(Math.cos(rads)),0,Math.sin(rads));
+      client.back(Math.abs(Math.cos(rads)));
+      client.right(Math.sin(rads));
+      //move(0,Math.abs(Math.cos(rads)),0,Math.sin(rads));
       console.log(ev);
     }else if (ev>180 & ev<=270){
-      move(0,Math.abs(Math.cos(rads)),Math.abs(Math.sin(rads)),0);
+      client.back(Math.abs(Math.cos(rads)));
+      client.left(Math.abs(Math.sin(rads)));
+      //move(0,Math.abs(Math.cos(rads)),Math.abs(Math.sin(rads)),0);
       console.log(ev);
     }else if (ev>270 & ev<=360){
-      move(Math.cos(rads),0,Math.abs(Math.sin(rads)),0);
+      client.front(Math.cos(rads));
+      client.left(Math.abs(Math.sin(rads)));
+      //move(Math.cos(rads),0,Math.abs(Math.sin(rads)),0);
       console.log(ev);
     }
     client.stop();
@@ -117,8 +125,8 @@ function keyReturn(str, key) {
     takeoff = client.takeoff();
     console.log('Take Off',takeoff);
   } else if (key.name === 'return') {
-    data = client.on('navdata', console.log);
-    console.log('Data', data);
+    // data = client.on('navdata', console.log);
+    // console.log('Data', data);
   } else if (key.code === '[A') {
     front = client.front(speed);
     console.log('Move Forward', front);
