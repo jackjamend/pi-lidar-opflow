@@ -1,7 +1,7 @@
 const spawn = require('child_process').spawn;
 const py = spawn('python3', ['Controller.py']);
 
-const speed = 0.3;
+const speed = 0.1;
 var ev = '';
 const readline = require('readline')
 readline.emitKeypressEvents(process.stdin);
@@ -27,11 +27,11 @@ py.stdout.on('data', function(data){
   ev = data.toString().trim();
   if(isNaN(ev)){
     if(ev == "left"){
-      client.counterClockwise(0.5);
+      client.counterClockwise(speed);
       console.log("turn left")
     }
     else if(ev == "right"){
-      client.clockwise(0.5);
+      client.clockwise(speed);
       console.log("turn right")
     }
   }else{
@@ -41,13 +41,13 @@ py.stdout.on('data', function(data){
       move(Math.cos(rads),0,0,Math.sin(rads));
       console.log(ev);
     }else if (ev>90 & ev<=180){
-      move(0,abs(Math.cos(rads)),0,Math.sin(rads));
+      move(0,Math.abs(Math.cos(rads)),0,Math.sin(rads));
       console.log(ev);
     }else if (ev>180 & ev<=270){
-      move(0,abs(Math.cos(rads)),abs(Math.sin(rads)),0);
+      move(0,Math.abs(Math.cos(rads)),Math.abs(Math.sin(rads)),0);
       console.log(ev);
     }else if (ev>270 & ev<=360){
-      move(Math.cos(rads),0,abs(Math.sin(rads)),0);
+      move(Math.cos(rads),0,Math.abs(Math.sin(rads)),0);
       console.log(ev);
     }
     client.stop();
