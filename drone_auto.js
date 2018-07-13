@@ -12,13 +12,6 @@ console.log("ar drone made");
 const client = arDrone.createClient();
 console.log("client made");
 
-function sleep(time, callback) {
-    var stop = new Date().getTime();
-    while(new Date().getTime() < stop + time) {
-        ;
-    }
-    callback();
-}
 
 client.takeoff();
 console.log("taking off");
