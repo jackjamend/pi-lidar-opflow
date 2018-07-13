@@ -49,7 +49,7 @@ class RPLiDAR:
             if i > limit:
                 break
             sector_space = {}
-            divisor = 360 / sectors
+            divisor = 360 // sectors
 
             for scan in scans:
                 section = math.floor(scan[1] / divisor)
@@ -57,15 +57,15 @@ class RPLiDAR:
                     sector_space[section].append(scan[2])
                 except KeyError:
                     sector_space[section] = np.array(scan[2])
-            print('evaluate space', self.evaluate_spcae(sector_space, sectors))
+            print('evaluate space', self._evaluate_spcae(sector_space,
+                                                         sectors))
 
-    def evaluate_spcae(self, sector_space, sectors, min_threshold=1000):
+    def _evaluate_spcae(self, sector_space, sectors, min_threshold=1000):
         evaluation = []
         for i in range(sectors):
             section = sector_space[i]
             evaluation.append((section, np.min(section), np.max(section),
-                               np.average(
-                section)))
+                               np.average(section)))
         return evaluation
 
 
@@ -77,3 +77,6 @@ class RPLiDAR:
         self.lidar.disconnect()
 
 
+if __name__ == '__main__':
+    lidar = RPLiDAR()
+    lidar.area_report(50,6)
