@@ -24,15 +24,15 @@ client.takeoff();
 console.log("taking off");
 //anytime we info back this process should be done.
 py.stdout.on('data', function(data){
-  ev = data.toString();
+  ev = data.toString().trim();
   if(isNaN(ev)){
     if(ev == "left"){
       client.counterClockwise(0.5);
-      client.stop();
+      console.log("turn left")
     }
     else if(ev == "right"){
       client.clockwise(0.5);
-      client.stop();
+      console.log("turn right")
     }
   }else{
     rads = ev*(Math.PI/180)
@@ -49,8 +49,10 @@ py.stdout.on('data', function(data){
     }else if (ev>270 & ev<=360){
       move(Math.cos(rads),0,abs(Math.sin(rads)),0);
       console.log(ev);
-
-}}});
+    }
+    client.stop();
+  }
+});
 
 py.stdout.on('end', function(){
   client.stop();
