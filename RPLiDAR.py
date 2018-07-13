@@ -61,7 +61,7 @@ class RPLiDAR:
             print('evaluate space', self._evaluate_spcae(sector_space,
                                                          sectors))
 
-    def _evaluate_spcae(self, sector_space, sectors, min_threshold=1000):
+    def _evaluate_spcae(self, sector_space, sectors):
         evaluation = []
         for i in range(sectors):
             try:
