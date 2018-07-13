@@ -39,23 +39,23 @@ py.stdout.on('data', function(data){
     rads = ev*(Math.PI/180)
     console.log(ev);
     if(ev>=0 & ev<=90){
-      client.front(Math.cos(rads));
-      client.right(Math.sin(rads));
+      client.front(.1);
+      client.right(.1);
       //move(Math.cos(rads),0,0,Math.sin(rads));
       console.log(ev);
     }else if (ev>90 & ev<=180){
-      client.back(Math.abs(Math.cos(rads)));
-      client.right(Math.sin(rads));
+      client.back(.1);
+      client.right(.1);
       //move(0,Math.abs(Math.cos(rads)),0,Math.sin(rads));
       console.log(ev);
     }else if (ev>180 & ev<=270){
-      client.back(Math.abs(Math.cos(rads)));
-      client.left(Math.abs(Math.sin(rads)));
+      client.back(.1);
+      client.left(.1);
       //move(0,Math.abs(Math.cos(rads)),Math.abs(Math.sin(rads)),0);
       console.log(ev);
     }else if (ev>270 & ev<=360){
-      client.front(Math.cos(rads));
-      client.left(Math.abs(Math.sin(rads)));
+      client.front(.1);
+      client.left(.1);
       //move(Math.cos(rads),0,Math.abs(Math.sin(rads)),0);
       console.log(ev);
     }
