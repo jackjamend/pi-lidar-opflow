@@ -127,6 +127,7 @@ function keyReturn(str, key) {
   } else if (key.name === 'return') {
     // data = client.on('navdata', console.log);
     // console.log('Data', data);
+    //
   } else if (key.code === '[A') {
     front = client.front(speed);
     console.log('Move Forward', front);
