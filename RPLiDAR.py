@@ -54,8 +54,8 @@ class RPLiDAR:
             for scan in scans:
                 section = math.floor(scan[1] / divisor)
                 try:
-                    sector_space[section] = np.put(sector_space[section],
-                                                   scan[2])
+                    sector_space[section] = np.append(sector_space[section],
+                                                      scan[2])
                 except KeyError:
                     sector_space[section] = np.array(scan[2])
             print('evaluate space', self._evaluate_spcae(sector_space,
@@ -64,9 +64,12 @@ class RPLiDAR:
     def _evaluate_spcae(self, sector_space, sectors, min_threshold=1000):
         evaluation = []
         for i in range(sectors):
-            section = sector_space[i]
-            evaluation.append((section, np.min(section), np.max(section),
-                               np.average(section)))
+            try:
+                section = sector_space[i]
+                evaluation.append((section, np.min(section), np.max(section),
+                                   np.average(section)))
+            except KeyError:
+                evaluation.append((1, None, None, None))
         return evaluation
 
 
