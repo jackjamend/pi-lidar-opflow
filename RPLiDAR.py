@@ -47,6 +47,7 @@ class RPLiDAR:
     def area_report(self, limit=100, sectors=6):
         for i, scans in enumerate(self.lidar.iter_scans()):
             if i > limit:
+                self.stop()
                 break
             sector_space = {}
             divisor = 360 // sectors
@@ -72,9 +73,6 @@ class RPLiDAR:
                 evaluation.append((1, None, None, None))
         return evaluation
 
-
-
-
     def stop(self):
         self.lidar.stop()
         self.lidar.stop_motor()
@@ -84,3 +82,4 @@ class RPLiDAR:
 if __name__ == '__main__':
     lidar = RPLiDAR()
     lidar.area_report(50,6)
+    lidar.stop()
