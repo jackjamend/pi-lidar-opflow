@@ -55,7 +55,9 @@ py.stdout.on('data', function(data){
       //move(Math.cos(rads),0,Math.abs(Math.sin(rads)),0);
       console.log('4',rads);
     }
+    setTimeout(function(){
     client.stop();
+},500)
   }
 });
 
