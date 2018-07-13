@@ -35,25 +35,25 @@ py.stdout.on('data', function(data){
       console.log("turn right")
     }
   else{
-    console.log('Math shit');
+//    console.log('Math shit');
     rads = ev*(Math.PI/180)
-    console.log(ev);
+    console.log(rads);
     if(ev>=0 & ev<=90){
       move(Math.cos(rads), Math.sin(rads))
       //(Math.cos(rads),0,0,Math.sin(rads));
-      console.log(ev);
+      console.log('1',rads);
     }else if (ev>90 & ev<=180){
       move(Math.cos(rads), Math.sin(rads))
       //move(0,Math.abs(Math.cos(rads)),0,Math.sin(rads));
-      console.log(ev);
+      console.log('2',rads);
     }else if (ev>180 & ev<=270){
       move(Math.cos(rads), Math.sin(rads))
       //move(0,Math.abs(Math.cos(rads)),Math.abs(Math.sin(rads)),0);
-      console.log(ev);
+      console.log('3',rads);
     }else if (ev>270 & ev<=360){
       move(Math.cos(rads), Math.sin(rads))
       //move(Math.cos(rads),0,Math.abs(Math.sin(rads)),0);
-      console.log(ev);
+      console.log('4',rads);
     }
     client.stop();
   }
