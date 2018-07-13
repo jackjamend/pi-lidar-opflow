@@ -12,62 +12,51 @@ console.log("ar drone made");
 const client = arDrone.createClient();
 console.log("client made");
 
-function sleep(time) {
+function sleep(time, callback) {
     var stop = new Date().getTime();
     while(new Date().getTime() < stop + time) {
-
+        ;
     }
+    callback();
 }
 
 client.takeoff();
 console.log("taking off");
 //anytime we info back this process should be done.
 py.stdout.on('data', function(data){
-     ev = data.toString().trim();
+  ev = data.toString().trim();
+
     if(ev == "left"){
-        client.counterClockwise(speed);
-        console.log("turn left")
-    } else if(ev == "right"){
+      client.counterClockwise(speed);
+      console.log("turn left")
+    }
+    else if(ev == "right"){
       client.clockwise(speed);
       console.log("turn right")
-    } else {
-//        console.log('Math shit');
-        rads = ev*(Math.PI/180)
-        console.log(ev);
-        if(ev>=0 && ev<=90){
-            client.front(.1);
-            sleep(100);
-            client.right(.1);
-            sleep(100);
-            //move(Math.cos(rads),0,0,Math.sin(rads));
-            console.log('1',rads);
-        } else if (ev>90 && ev<=180){
-            client.back(.1);
-            sleep(100);
-            client.right(.1);
-            sleep(100);
-            //move(0,Math.abs(Math.cos(rads)),0,Math.sin(rads));
-            console.log('2',rads);
-        } else if (ev>180 && ev<=270){
-            client.back(.1);
-            sleep(100);
-            client.left(.1);
-            sleep(100);
-            //move(0,Math.abs(Math.cos(rads)),Math.abs(Math.sin(rads)),0);
-            console.log('3',rads);
-        } else if (ev>270 && ev<=360){
-            client.front(.1);
-            sleep(100);
-            client.left(.1);
-            sleep(100);
-            //move(Math.cos(rads),0,Math.abs(Math.sin(rads)),0);
-            console.log('4',rads);
-        } else {
-            console.log('else',ev);
-        }
+    }
+  else{
+    console.log('Math shit');
+    rads = ev*(Math.PI/180)
+    console.log(ev);
+    if(ev>=0 & ev<=90){
+      move(Math.cos(rads), Math.sin(rads))
+      //(Math.cos(rads),0,0,Math.sin(rads));
+      console.log(ev);
+    }else if (ev>90 & ev<=180){
+      move(Math.cos(rads), Math.sin(rads))
+      //move(0,Math.abs(Math.cos(rads)),0,Math.sin(rads));
+      console.log(ev);
+    }else if (ev>180 & ev<=270){
+      move(Math.cos(rads), Math.sin(rads))
+      //move(0,Math.abs(Math.cos(rads)),Math.abs(Math.sin(rads)),0);
+      console.log(ev);
+    }else if (ev>270 & ev<=360){
+      move(Math.cos(rads), Math.sin(rads))
+      //move(Math.cos(rads),0,Math.abs(Math.sin(rads)),0);
+      console.log(ev);
+    }
+    client.stop();
   }
-  sleep(100);
-  client.stop();
 });
 
 py.stdout.on('end', function(){
@@ -76,12 +65,9 @@ py.stdout.on('end', function(){
   console.log("landing");
 });
 
-function move(f,b,l,r){
-  client.left(l);
-  client.right(r);
+function move(f,r){
   client.front(f);
-  client.back(b);
-  client.stop();
+  client.right(r);
 };
 
 process.stdin.on('keypress', (str, key) => {
