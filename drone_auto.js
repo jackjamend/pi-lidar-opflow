@@ -29,7 +29,16 @@ py.stdout.on('data', function(data){
     }
   else{
 //    console.log('Math shit');
-    rads = ev*(Math.PI/180)
+    if(ev ==0){
+      move(.5,0);
+    }
+    else if (ev ==30){
+      move(0, .5);
+    }
+    else if (ev == 330){
+      move(0,-.5);
+    }
+    /*rads = ev*(Math.PI/180)
     console.log(rads);
     if(ev>=0 & ev<=90){
       move(Math.cos(rads), Math.sin(rads))
@@ -47,7 +56,7 @@ py.stdout.on('data', function(data){
       move(Math.cos(rads), Math.sin(rads))
       //move(Math.cos(rads),0,Math.abs(Math.sin(rads)),0);
       console.log('4',rads);
-    }
+    }*/
     setTimeout(function(){
     client.stop();
 },500)
