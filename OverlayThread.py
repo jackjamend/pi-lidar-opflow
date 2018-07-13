@@ -29,7 +29,7 @@ class OverlayThread(threading.Thread):
                 # start = time.time()
                 frame, tracks = self.analyze_q.get()
                 output = self.image_with_boxes(frame, tracks, show_image=False)
-                self.overlay_q.put((output, self.lookup))
+                self.overlay_q.put((output, self.lookup, self.scores))
                 self.find_zone()
                 self.history *= .95
                 # print('Overlay thread ran for %.2f seconds and %d tracks' %
@@ -77,8 +77,9 @@ class OverlayThread(threading.Thread):
             px, py = point
             x_sector = px // width
             y_sector = py // height
-            self.lookup[x_sector][y_sector] += 1
-            self.history[x_sector][y_sector] += 1
+            if x_sector != 8 and y_sector != 8:
+                self.lookup[x_sector][y_sector] += 1
+                self.history[x_sector][y_sector] += 1
 
     def overlay_image(self, image):
         overlay = image.copy()

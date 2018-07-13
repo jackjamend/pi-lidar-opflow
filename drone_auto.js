@@ -25,7 +25,7 @@ console.log("taking off");
 //anytime we info back this process should be done.
 py.stdout.on('data', function(data){
   ev = data.toString().trim();
-  if(isNaN(ev)){
+
     if(ev == "left"){
       client.counterClockwise(speed);
       console.log("turn left")
@@ -34,7 +34,7 @@ py.stdout.on('data', function(data){
       client.clockwise(speed);
       console.log("turn right")
     }
-  }else{
+  else{
     rads = ev*(Math.PI/180)
     console.log(ev);
     if(ev>=0 & ev<=90){

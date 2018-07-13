@@ -29,6 +29,7 @@ class DroneData:
         for thread in self.threads:
             thread.setDaemon(True)
         self.lookup = []
+        self.scores = []
         self.verbose = True
 
     def run(self):
@@ -40,7 +41,7 @@ class DroneData:
         self.lidar.start()
         while True:
             if not self.overlay_q.empty():
-                frame, self.lookup = self.overlay_q.get()
+                frame, self.lookup, self.scores = self.overlay_q.get()
                 if self.verbose:
                     display = ['Total frames in frame_q: %d' %
                                self.frame_q.qsize(),
@@ -92,13 +93,19 @@ class DroneData:
         print('Closed')
 
     def yaw(self):
-        if self.overlay.scores[self.overlay.travel_zone] > 1.5:
-            max_movement = np.unravel_index(np.argmax(self.lookup),
-                                            self.lookup.shape)
-            if max_movement[0] < 3:
-                print('left', flush=True)
-            elif max_movement[0] > 4:
-                print('right', flush=True)
+        if self.scores == []:
+            return
+        try:
+            if self.scores[self.overlay.travel_zone] > .50:
+                max_movement = np.unravel_index(np.argmax(self.lookup),
+                                                self.lookup.shape)
+                if max_movement[0] < 3:
+                    print('left', flush=True)
+                elif max_movement[0] > 4:
+                    print('right', flush=True)
+        except IndexError:
+            print('Index error: zone #', self.overlay.travel_zone,
+                  self.scores)
 
     def move(self):
         direction = self.overlay.travel_zone
