@@ -7,22 +7,31 @@ const readline = require('readline')
 readline.emitKeypressEvents(process.stdin);
 process.stdin.setRawMode(true);
 
-var arDrone = require('ar-drone');
+const arDrone = require('ar-drone');
 console.log("ar drone made");
-var client = arDrone.createClient();
+const client = arDrone.createClient();
 console.log("client made");
+
+function sleep(time, callback) {
+    var stop = new Date().getTime();
+    while(new Date().getTime() < stop + time) {
+        ;
+    }
+    callback();
+}
 
 client.takeoff();
 console.log("taking off");
 //anytime we info back this process should be done.
 py.stdout.on('data', function(data){
   ev = data.toString();
+  console.log('ev', ev)
   if(ev == "left"){
     client.counterClockwise(0.5);
-    client.stop();
+    sleep(250, client.stop());
   } else if(ev == "right"){
     client.clockwise(0.5);
-    client.stop();
+    sleep(250, client.stop());
   } else if(ev=="Finished!"){
     process.exit()
   } else {
@@ -30,16 +39,16 @@ py.stdout.on('data', function(data){
       console.log(ev);
       if(ev>=0 & ev<=90){
       move(Math.cos(rads),0,0,Math.sin(rads));
-      console.log(ev);
+      console.log(rads);
     } else if (ev>90 & ev<=180){
       move(0,Math.abs(Math.cos(rads)),0,Math.sin(rads));
-      console.log(ev);
+      console.log(rads);
     } else if (ev>180 & ev<=270){
       move(0,Math.abs(Math.cos(rads)),Math.abs(Math.sin(rads)),0);
-      console.log(ev);
+      console.log(rads);
     } else if (ev>270 & ev<=360){
       move(Math.cos(rads),0,Math.abs(Math.sin(rads)),0);
-      console.log(ev);
+      console.log(rads);
     }
   }
 });
