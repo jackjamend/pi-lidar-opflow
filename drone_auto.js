@@ -147,13 +147,3 @@ function getInfo(str, key) {
 }
 
 console.log("starting program");
-/*process.stdin.on('keypress', (str,key)=>{
-    if(key && key.name =='t') {
-      console.log("taking off!");
-    } else if(key && key.ctrl && key.name == 'c') {
-      process.exit();
-    } else {
-      console.log(`You pressed the "$[str]" key`);
-    }
-  })
-*/
