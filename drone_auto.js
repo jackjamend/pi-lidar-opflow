@@ -12,12 +12,11 @@ console.log("ar drone made");
 const client = arDrone.createClient();
 console.log("client made");
 
-function sleep(time, callback) {
+function sleep(time) {
     var stop = new Date().getTime();
     while(new Date().getTime() < stop + time) {
-        ;
+
     }
-    callback();
 }
 
 client.takeoff();
@@ -36,29 +35,38 @@ py.stdout.on('data', function(data){
         rads = ev*(Math.PI/180)
         console.log(ev);
         if(ev>=0 && ev<=90){
-            client.front(.7);
-            client.right(.7);
+            client.front(.1);
+            sleep(100);
+            client.right(.1);
+            sleep(100);
             //move(Math.cos(rads),0,0,Math.sin(rads));
             console.log('1',rads);
         } else if (ev>90 && ev<=180){
-            client.back(.7);
-            client.right(.7);
+            client.back(.1);
+            sleep(100);
+            client.right(.1);
+            sleep(100);
             //move(0,Math.abs(Math.cos(rads)),0,Math.sin(rads));
             console.log('2',rads);
         } else if (ev>180 && ev<=270){
-            client.back(.7);
-            client.left(.7);
+            client.back(.1);
+            sleep(100);
+            client.left(.1);
+            sleep(100);
             //move(0,Math.abs(Math.cos(rads)),Math.abs(Math.sin(rads)),0);
             console.log('3',rads);
         } else if (ev>270 && ev<=360){
-            client.front(.7);
-            client.left(.7);
+            client.front(.1);
+            sleep(100);
+            client.left(.1);
+            sleep(100);
             //move(Math.cos(rads),0,Math.abs(Math.sin(rads)),0);
             console.log('4',rads);
         } else {
             console.log('else',ev);
         }
   }
+  sleep(100);
   client.stop();
 });
 
