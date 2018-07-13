@@ -54,7 +54,8 @@ class RPLiDAR:
             for scan in scans:
                 section = math.floor(scan[1] / divisor)
                 try:
-                    sector_space[section].put(scan[2])
+                    sector_space[section] = np.put(sector_space[section],
+                                                   scan[2])
                 except KeyError:
                     sector_space[section] = np.array(scan[2])
             print('evaluate space', self._evaluate_spcae(sector_space,
