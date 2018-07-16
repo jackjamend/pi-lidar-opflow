@@ -37,11 +37,10 @@ class DroneData:
         self.scores = []
         self.verbose = True
         self.image_folder = "./data/screen-shots"
-        self.data_folder = ""
         self._setup()
         self.image_number = 1
         self.passed_safety_zone = False
-        self.csv_file = './data/drone-data'
+        self.csv_file = './data/drone-data.csv'
         self.file = open(self.csv_file, 'w')
         self.writer = csv.writer(self.file)
 
@@ -83,16 +82,16 @@ class DroneData:
                             int(self.overlay.travel_zone), (20, 40),
                             cv2.FONT_HERSHEY_PLAIN, 1.0, (255, 255, 255),
                             lineType=cv2.LINE_AA)
-                try:
-                    cv2.imshow("Camera Feed", frame)
-                except cv2.error:
-                    # print("Whoops, cv2 error!")
-                    pass
+                # try:
+                #     # cv2.imshow("Camera Feed", frame)
+                # except cv2.error:
+                #     # print("Whoops, cv2 error!")
+                #     pass
 
             if not self.lidar_q.empty() and self.lidar.in_danger_zone:
                 # print(colored("Object within LiDAR threshold", 'yellow'))
                 cv2.imwrite(self.image_folder + '/unsafe-screen-shot' +
-                            str(self.image_number), frame)
+                            str(self.image_number)+'.jpeg', frame)
                 self.passed_safety_zone = True
                 self.csv_q.put((datetime.datetime.time(
                                 datetime.datetime.now()).strftime(
@@ -110,7 +109,7 @@ class DroneData:
                     self.lidar_q.queue.clear()
             elif self.passed_safety_zone and not self.lidar.in_danger_zone:
                 cv2.imwrite(self.image_folder + '/safe-screen-shot' +
-                            str(self.image_number), frame)
+                            str(self.image_number)+'.jpeg', frame)
                 self.csv_q.put((datetime.datetime.time(
                     datetime.datetime.now()).strftime(
                     '%H:%M:%S'), 'out of danger zone',
@@ -133,7 +132,6 @@ class DroneData:
     def _write_file(self):
         while not self.csv_q.empty():
             self.writer.writerow(self.csv_q.get())
-        self.writer.close()
         self.file.close()
 
     def kill_threads(self):
