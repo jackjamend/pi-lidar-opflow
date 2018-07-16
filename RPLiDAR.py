@@ -15,6 +15,7 @@ class RPLiDAR:
         info = self.lidar.get_info()
         health = self.lidar.get_health()
         print(info, health, sep='\n')
+        self.file = open('lidar-data.txt', 'r')
 
     def scan_area(self, limit=100):
         for i, scan in enumerate(self.lidar.iter_scans()):
@@ -45,7 +46,7 @@ class RPLiDAR:
                 evacuation_direction = \
                     (sector_space.index(free_space)+1) * 60 - 30
                 print("Evacuate in the direction of %d degrees"
-                      % evacuation_direction) # This is the safest spot
+                      % evacuation_direction)  # This is the safest spot
 
     def area_report(self, limit=100):
         for i, scans in enumerate(self.lidar.iter_scans()):
@@ -62,7 +63,12 @@ class RPLiDAR:
                                                            section], scan[2])
                 except KeyError:
                     self.sector_space[section] = np.array(scan[2])
-            print('evaluate space', self._evaluate_spcae())
+            evaluation_space = self._evaluate_spcae()
+            print('evaluate space', evaluation_space, file=self.file)
+            direction = self._get_direction(evaluation_space)
+            if direction == -1:
+                print('There are no safe regions!')
+            print('Go to region %d' % direction)
 
     def _evaluate_spcae(self):
         evaluation = []
@@ -74,6 +80,15 @@ class RPLiDAR:
             except KeyError:
                 evaluation.append((i, None, None, None))
         return evaluation
+
+    def _get_direction(self, evaluation_space):
+        current_section = -1
+        previous_min = 1
+        for section, min, max, average in evaluation_space:
+            if min > previous_min:
+                current_section = section
+                previous_min = min
+        return current_section
 
     def stop(self):
         self.lidar.stop()
