@@ -2,11 +2,14 @@ from rplidar import RPLidar
 import time
 import math
 import numpy as np
+import csv
+import datetime
 
 
 class RPLiDAR:
     def __init__(self, sectors):
-        self.lidar = RPLidar("\\\\.\\com4") # Check to see if this runs on mac
+        # self.lidar = RPLidar("\\\\.\\com4") # Check to see if this runs on mac
+        self.lidar = RPLidar("/dev/ttyUSB0")
         #  laptop. If not make change. May be the /dev/ thing
         self.sectors = sectors
         self.sector_space = {}
@@ -15,7 +18,8 @@ class RPLiDAR:
         info = self.lidar.get_info()
         health = self.lidar.get_health()
         print(info, health, sep='\n')
-        self.file = open('lidar-data.txt', 'r')
+        self.file = open('lidar-data.csv', 'w')
+        self.writer = csv.writer(self.file)
 
     def scan_area(self, limit=100):
         for i, scan in enumerate(self.lidar.iter_scans()):
@@ -64,39 +68,54 @@ class RPLiDAR:
                 except KeyError:
                     self.sector_space[section] = np.array(scan[2])
             evaluation_space = self._evaluate_spcae()
-            print('evaluate space', evaluation_space, file=self.file)
+            # print('evaluate space at ', time.time(), evaluation_space,
+            #       file=self.file)
+            # self.file.write('evaluate space \n' + str(evaluation_space))
             direction = self._get_direction(evaluation_space)
             if direction == -1:
                 print('There are no safe regions!')
             print('Go to region %d' % direction)
+            self._write_file(evaluation_space, direction)
 
     def _evaluate_spcae(self):
         evaluation = []
         for i in range(self.sectors):
             try:
                 section = self.sector_space[i]
-                evaluation.append((section, np.min(section), np.max(section),
-                                   np.average(section)))
+                evaluation.append((i, np.min(section),
+                                   np.max(section),
+                                   np.average(section), section))
             except KeyError:
-                evaluation.append((i, None, None, None))
+                evaluation.append((None, i, None, None, None))
         return evaluation
 
     def _get_direction(self, evaluation_space):
         current_section = -1
         previous_min = 1
-        for section, min, max, average in evaluation_space:
-            if min > previous_min:
-                current_section = section
-                previous_min = min
+        for value in evaluation_space:
+            # print(value)
+            section, min, max, average, sector = value
+            try:
+                if min > previous_min:
+                    current_section = section
+                    previous_min = min
+            except TypeError:
+                pass
         return current_section
 
+    def _write_file(self, evaluation_space, direction):
+        self.writer.writerow('sector number: %d' % direction)
+        for values in evaluation_space:
+            self.writer.writerow((datetime.datetime.time(
+                datetime.datetime.now()).strftime('%H:%M:%S'), values))
     def stop(self):
         self.lidar.stop()
         self.lidar.stop_motor()
         self.lidar.disconnect()
+        self.file.close()
 
 
 if __name__ == '__main__':
     lidar = RPLiDAR(6)
-    lidar.area_report(50)
+    lidar.area_report(100)
     lidar.stop()

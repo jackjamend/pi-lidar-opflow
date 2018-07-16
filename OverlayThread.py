@@ -89,13 +89,12 @@ class OverlayThread(threading.Thread):
             bottom_x = top_x + (self.resolution[0] // self.reduction)
             bottom_y = top_y + (self.resolution[1] // self.reduction)
             cv2.rectangle(image, (top_x, top_y), (bottom_x, bottom_y),
-                          (0, 0, 0), 1)  #Grid Lines
+                          (0, 0, 0), 1)  # Grid Lines
             if x:
                 cv2.rectangle(overlay, (top_x, top_y), (bottom_x, bottom_y),
                               colors[2], -1)
         alpha = .4
         cv2.addWeighted(overlay, alpha, image, 1 - alpha, 0, image)
-
 
     def find_zone(self):
         # print(self.lookup)
