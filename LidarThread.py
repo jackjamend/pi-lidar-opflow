@@ -1,8 +1,8 @@
 import threading, queue
 from lidar_lite import Lidar_Lite as lidar
 
-class LidarThread(threading.Thread):
 
+class LidarThread(threading.Thread):
     def __init__(self, high_value_q: queue.Queue, name=None):
         super(LidarThread, self).__init__(name=name)
         self.stop_request = threading.Event()
@@ -10,7 +10,7 @@ class LidarThread(threading.Thread):
         self.lidar = lidar()
         connect = self.lidar.connect(1)
         if connect < -1:
-            raise Exception("No lidar found")
+            raise Exception("No LiDAR found")
         self.lidar.setThreshold(100)
         self.current_value = None
 

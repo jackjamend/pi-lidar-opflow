@@ -15,10 +15,10 @@ class OverlayThread(threading.Thread):
         self.overlay_q = overlay_q
         self.reduction = reduction
         self.resolution = resolution
-        self.dx = resolution[0]// reduction
+        self.dx = resolution[0] // reduction
         self.dy = resolution[1] // reduction
-        self.lookup = np.zeros((reduction,reduction))
-        self.history = np.zeros((reduction,reduction))
+        self.lookup = np.zeros((reduction, reduction))
+        self.history = np.zeros((reduction, reduction))
         self.travel_zone = 1
         self.scores = []
 
@@ -89,7 +89,7 @@ class OverlayThread(threading.Thread):
             bottom_x = top_x + (self.resolution[0] // self.reduction)
             bottom_y = top_y + (self.resolution[1] // self.reduction)
             cv2.rectangle(image, (top_x, top_y), (bottom_x, bottom_y),
-                          (0, 0, 0), 1) #Grid Lines
+                          (0, 0, 0), 1)  #Grid Lines
             if x:
                 cv2.rectangle(overlay, (top_x, top_y), (bottom_x, bottom_y),
                               colors[2], -1)

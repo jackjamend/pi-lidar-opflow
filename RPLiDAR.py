@@ -70,7 +70,7 @@ class RPLiDAR:
                 evaluation.append((section, np.min(section), np.max(section),
                                    np.average(section)))
             except KeyError:
-                evaluation.append((1, None, None, None))
+                evaluation.append((i, None, None, None))
         return evaluation
 
     def stop(self):
@@ -81,5 +81,5 @@ class RPLiDAR:
 
 if __name__ == '__main__':
     lidar = RPLiDAR()
-    lidar.area_report(50,6)
+    lidar.area_report(50, 6)
     lidar.stop()

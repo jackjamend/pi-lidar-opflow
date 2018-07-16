@@ -19,8 +19,8 @@ class PiFrameThread(threading.Thread):
     def run(self):
         while not self.stop_request.isSet():
             for image in self.camera.capture_continuous(self.rawCapture,
-                                                       format="bgr",
-                                                   use_video_port=True):
+                                                        format="bgr",
+                                                        use_video_port=True):
                 frame = image.array
                 self.frame_q.put(frame)
                 self.rawCapture.truncate(0)
