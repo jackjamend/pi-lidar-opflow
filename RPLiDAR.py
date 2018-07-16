@@ -5,9 +5,12 @@ import numpy as np
 
 
 class RPLiDAR:
-    def __init__(self):
+    def __init__(self, sectors):
         self.lidar = RPLidar("\\\\.\\com4") # Check to see if this runs on mac
         #  laptop. If not make change. May be the /dev/ thing
+        self.sectors = sectors
+        self.sector_space = {}
+        self.prev_sector_space = {}
         time.sleep(1)
         info = self.lidar.get_info()
         health = self.lidar.get_health()
@@ -44,29 +47,28 @@ class RPLiDAR:
                 print("Evacuate in the direction of %d degrees"
                       % evacuation_direction) # This is the safest spot
 
-    def area_report(self, limit=100, sectors=6):
+    def area_report(self, limit=100):
         for i, scans in enumerate(self.lidar.iter_scans()):
             if i > limit:
                 # self.stop()
                 break
-            sector_space = {}
-            divisor = 360 // sectors
+            self.sector_space = {}
+            divisor = 360 // self.sectors
 
             for scan in scans:
                 section = math.floor(scan[1] / divisor)
                 try:
-                    sector_space[section] = np.append(sector_space[section],
-                                                      scan[2])
+                    self.sector_space[section] = np.append(self.sector_space[
+                                                           section], scan[2])
                 except KeyError:
-                    sector_space[section] = np.array(scan[2])
-            print('evaluate space', self._evaluate_spcae(sector_space,
-                                                         sectors))
+                    self.sector_space[section] = np.array(scan[2])
+            print('evaluate space', self._evaluate_spcae())
 
-    def _evaluate_spcae(self, sector_space, sectors):
+    def _evaluate_spcae(self):
         evaluation = []
-        for i in range(sectors):
+        for i in range(self.sectors):
             try:
-                section = sector_space[i]
+                section = self.sector_space[i]
                 evaluation.append((section, np.min(section), np.max(section),
                                    np.average(section)))
             except KeyError:
@@ -80,6 +82,6 @@ class RPLiDAR:
 
 
 if __name__ == '__main__':
-    lidar = RPLiDAR()
-    lidar.area_report(50, 6)
+    lidar = RPLiDAR(6)
+    lidar.area_report(50)
     lidar.stop()

@@ -3,21 +3,21 @@ from time import time as timer
 
 
 class LiteTTC:
-    def init(self):
+    def init(self, threshold=100):
         self.lidar = Lidar_Lite()
         connected = self.lidar.connect(1)
+        self.lidar.setThreshold(threshold)
         if connected < -1:
             print("Not Connected")
 
-    def main(self):
-
+    def start(self, running):
         start_time = timer()
-        current_distance = self.lidar.getDistance()/100
-        while True:
+        current_distance = self.lidar.getDistance() / 100
+        while running:
             previous_distance = current_distance
             prev_time = start_time
             start_time = timer()
-            current_distance = self.lidar.getDistance()/100
+            current_distance = self.lidar.getDistance() / 100
             self.ttc(prev_time, start_time, current_distance,
                      previous_distance)
 
@@ -26,7 +26,7 @@ class LiteTTC:
         # print(elapsed_time)
         distance_moved = prev_d-current_d
         # print(distance_moved)
-        if distance_moved>.035 or distance_moved<-.035:
+        if distance_moved > .035 or distance_moved < -.035:
             velocity = distance_moved / elapsed_time
             if velocity > 0:
                 current_ttc = current_d/velocity
@@ -38,4 +38,4 @@ class LiteTTC:
 
 if __name__ == '__main__':
     lite_ttc = LiteTTC()
-    lite_ttc.main()
+    lite_ttc.start(True)
