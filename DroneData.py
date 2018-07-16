@@ -88,37 +88,37 @@ class DroneData:
                 #     # print("Whoops, cv2 error!")
                 #     pass
 
-            if not self.lidar_q.empty() and self.lidar.in_danger_zone:
-                # print(colored("Object within LiDAR threshold", 'yellow'))
-                cv2.imwrite(self.image_folder + '/unsafe-screen-shot' +
-                            str(self.image_number)+'.jpeg', frame)
-                self.passed_safety_zone = True
-                self.csv_q.put((datetime.datetime.time(
-                                datetime.datetime.now()).strftime(
-                                '%H:%M:%S'), 'in danger zone',
-                                self.lidar_q.get(),
-                                self.overlay.travel_zone, self.scores[0] if
-                                self.scores[0] < self.scores[2] else
-                                self.scores[2], self.lookup.flatten()))
+                if not self.lidar_q.empty() and self.lidar.in_danger_zone:
+                    # print(colored("Object within LiDAR threshold", 'yellow'))
+                    cv2.imwrite(self.image_folder + '/unsafe-screen-shot' +
+                                str(self.image_number)+'.jpeg', frame)
+                    self.passed_safety_zone = True
+                    self.csv_q.put((datetime.datetime.time(
+                                    datetime.datetime.now()).strftime(
+                                    '%H:%M:%S'), 'in danger zone',
+                                    self.lidar_q.get(),
+                                    self.overlay.travel_zone, self.scores[0] if
+                                    self.scores[0] < self.scores[2] else
+                                    self.scores[2], self.lookup.flatten()))
 
-                print('Safe zone: %d' % self.scores[0] if
-                                self.scores[0] < self.scores[2] else
-                                self.scores[2])
-                # Empty the LiDAR Queue
-                with self.lidar_q.mutex:
-                    self.lidar_q.queue.clear()
-            elif self.passed_safety_zone and not self.lidar.in_danger_zone:
-                cv2.imwrite(self.image_folder + '/safe-screen-shot' +
-                            str(self.image_number)+'.jpeg', frame)
-                self.csv_q.put((datetime.datetime.time(
-                    datetime.datetime.now()).strftime(
-                    '%H:%M:%S'), 'out of danger zone',
-                                self.lidar_q.get(),
-                                self.overlay.travel_zone, self.scores[0] if
-                                self.scores[0] < self.scores[2] else
-                                self.scores[2], self.lookup.flatten()))
-                self.image_number += 1
-                self.passed_safety_zone = False
+                    print('Safe zone: %d' % self.scores[0] if
+                                    self.scores[0] < self.scores[2] else
+                                    self.scores[2])
+                    # Empty the LiDAR Queue
+                    with self.lidar_q.mutex:
+                        self.lidar_q.queue.clear()
+                elif self.passed_safety_zone and not self.lidar.in_danger_zone:
+                    cv2.imwrite(self.image_folder + '/safe-screen-shot' +
+                                str(self.image_number)+'.jpeg', frame)
+                    self.csv_q.put((datetime.datetime.time(
+                        datetime.datetime.now()).strftime(
+                        '%H:%M:%S'), 'out of danger zone',
+                                    self.lidar_q.get(),
+                                    self.overlay.travel_zone, self.scores[0] if
+                                    self.scores[0] < self.scores[2] else
+                                    self.scores[2], self.lookup.flatten()))
+                    self.image_number += 1
+                    self.passed_safety_zone = False
 
             ch = 0xFF & cv2.waitKey(1)
             if ch == 27:
