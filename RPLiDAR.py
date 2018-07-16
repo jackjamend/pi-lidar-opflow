@@ -47,7 +47,7 @@ class RPLiDAR:
     def area_report(self, limit=100, sectors=6):
         for i, scans in enumerate(self.lidar.iter_scans()):
             if i > limit:
-                self.stop()
+                # self.stop()
                 break
             sector_space = {}
             divisor = 360 // sectors
