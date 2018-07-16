@@ -1,10 +1,12 @@
-frame = {}
+import numpy as np
 
-frame['hello'] = ['world']
-try:
-    frame['golf'].append('gross')
-except KeyError:
-    frame['golf'] = ['gross']
-frame['hello'].append('!')
+arr = np.zeros((8,8))
+count = 0
+for i in range(len(arr)):
+    for j in range(len(arr[i])):
+        arr[i][j] = count
+        count +=1
 
-print(frame)
+
+print(arr)
+print(arr.flatten())

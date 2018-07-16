@@ -5,7 +5,7 @@ import numpy as np
 import os
 import csv
 import datetime
-# from termcolor import colored
+from termcolor import colored
 
 from PiFrameThread import PiFrameThread
 from AnalyzeThread import AnalyzeThread
@@ -37,16 +37,16 @@ class DroneData:
         self.scores = []
         self.verbose = True
         self.image_folder = "./data/screen-shots"
+        self.csv_file = './data/drone-data.csv'
         self._setup()
         self.image_number = 1
         self.passed_safety_zone = False
-        self.csv_file = './data/drone-data.csv'
         self.file = open(self.csv_file, 'w')
         self.writer = csv.writer(self.file)
 
     def _setup(self):
         os.popen('mkdir -p %s' % self.image_folder)
-
+        os.popen('touch ' + self.csv_file)
 
     def run(self):
         self.pi_frame.start()
@@ -58,6 +58,7 @@ class DroneData:
         while True:
             if not self.overlay_q.empty():
                 frame, self.lookup, self.scores = self.overlay_q.get()
+                # print('frame received')
                 if self.verbose:
                     display = ['Total frames in frame_q: %d' %
                                self.frame_q.qsize(),
@@ -78,47 +79,60 @@ class DroneData:
                                 self.lidar.current_value, (20, 20),
                                 cv2.FONT_HERSHEY_PLAIN, 1.0,
                                 (255, 255, 255), lineType=cv2.LINE_AA)
-                cv2.putText(frame, 'Safe Travel Zone: %d' %
-                            int(self.overlay.travel_zone), (20, 40),
-                            cv2.FONT_HERSHEY_PLAIN, 1.0, (255, 255, 255),
-                            lineType=cv2.LINE_AA)
-                # try:
-                #     # cv2.imshow("Camera Feed", frame)
-                # except cv2.error:
-                #     # print("Whoops, cv2 error!")
-                #     pass
+                try:
+                    cv2.putText(frame, 'Safe Travel Zone: %d' %
+                                self.overlay.travel_zone,
+                                (20, 40), cv2.FONT_HERSHEY_PLAIN, 1.0,
+                                (255, 255, 255), lineType=cv2.LINE_AA)
+                except IndexError:
+                    continue
+                except TypeError:
+                    continue
+                try:
+                    # print('image displayed')
+                    cv2.imshow("Camera Feed", frame)
+                except cv2.error:
+                    # print("Whoops, cv2 error!")
+                    pass
 
-                if not self.lidar_q.empty() and self.lidar.in_danger_zone:
-                    # print(colored("Object within LiDAR threshold", 'yellow'))
-                    cv2.imwrite(self.image_folder + '/unsafe-screen-shot' +
-                                str(self.image_number)+'.jpeg', frame)
-                    self.passed_safety_zone = True
-                    self.csv_q.put((datetime.datetime.time(
-                                    datetime.datetime.now()).strftime(
-                                    '%H:%M:%S'), 'in danger zone',
-                                    self.lidar_q.get(),
-                                    self.overlay.travel_zone, self.scores[0] if
-                                    self.scores[0] < self.scores[2] else
-                                    self.scores[2], self.lookup.flatten()))
+            if not self.lidar_q.empty() and self.lidar.in_danger_zone and not \
+                    self.passed_safety_zone:
+                print(colored("Object within LiDAR threshold", 'yellow'))
+                self.screen_shots_q.put((self.image_folder +
+                                         '/unsafe-screen-shot' + datetime.datetime.time(
+                    datetime.datetime.now()).strftime(
+                    '%H:%M:%S') + '--' +
+                            str(self.image_number)+'.jpeg', frame))
+                self.passed_safety_zone = True
+                self.csv_q.put((datetime.datetime.time(
+                                datetime.datetime.now()).strftime(
+                                '%H:%M:%S'), 'in danger zone',
+                                self.lidar_q.get(),
+                                self.overlay.travel_zone, self.scores, 0 if
+                                self.scores[0] > self.scores[2] else
+                                2, np.transpose(self.lookup).flatten()))
 
-                    print('Safe zone: %d' % self.scores[0] if
-                                    self.scores[0] < self.scores[2] else
-                                    self.scores[2])
-                    # Empty the LiDAR Queue
-                    with self.lidar_q.mutex:
-                        self.lidar_q.queue.clear()
-                elif self.passed_safety_zone and not self.lidar.in_danger_zone:
-                    cv2.imwrite(self.image_folder + '/safe-screen-shot' +
-                                str(self.image_number)+'.jpeg', frame)
-                    self.csv_q.put((datetime.datetime.time(
-                        datetime.datetime.now()).strftime(
-                        '%H:%M:%S'), 'out of danger zone',
-                                    self.lidar_q.get(),
-                                    self.overlay.travel_zone, self.scores[0] if
-                                    self.scores[0] < self.scores[2] else
-                                    self.scores[2], self.lookup.flatten()))
-                    self.image_number += 1
-                    self.passed_safety_zone = False
+                print('Safe zone: %d' % 0 if
+                                self.scores[0] > self.scores[2] else
+                                2)
+                # Empty the LiDAR Queue
+                with self.lidar_q.mutex:
+                    self.lidar_q.queue.clear()
+            elif self.passed_safety_zone and not self.lidar.in_danger_zone:
+                self.screen_shots_q.put(
+                    (self.image_folder + '/safe-screen-shot' + datetime.datetime.time(
+                    datetime.datetime.now()).strftime(
+                    '%H:%M:%S')+'--' +
+                     str(self.image_number) + '.jpeg', frame))
+                self.csv_q.put((datetime.datetime.time(
+                    datetime.datetime.now()).strftime(
+                    '%H:%M:%S'), 'out of danger zone',
+                                self.lidar_q.get(),
+                                self.overlay.travel_zone, self.scores,
+                                0 if self.scores[0] > self.scores[2] else 2,
+                                np.transpose(self.lookup).flatten()))
+                self.image_number += 1
+                self.passed_safety_zone = False
 
             ch = 0xFF & cv2.waitKey(1)
             if ch == 27:
@@ -130,9 +144,19 @@ class DroneData:
         self.kill_threads()
 
     def _write_file(self):
+        print('writing csv file...')
         while not self.csv_q.empty():
             self.writer.writerow(self.csv_q.get())
         self.file.close()
+        print('Done!')
+        print('Saving images...')
+        count = 0
+        while not self.screen_shots_q.empty() and count < 20:
+            name, img = self.screen_shots_q.get()
+            cv2.imwrite(name, img)
+            count += 1
+            print('Image %d saved!' % count)
+        print('All images saved!')
 
     def kill_threads(self):
         print('Closing threads...')
@@ -142,5 +166,5 @@ class DroneData:
                 print('Thread %s closed!' % thread.getName())
             else:
                 print('Thread %s not closed!' % thread.getName())
-        print('Closed')
+        print('Closed!')
 

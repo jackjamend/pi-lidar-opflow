@@ -21,7 +21,7 @@ def main():
         drone_data = DroneData((640, 480), 8)
         drone_data.verbose = False
         drone_data.run()
-        print('Program ending')
+        print('Program ending...')
         drone_data.close()
     except KeyboardInterrupt:
         print("Keyboard Interruption. Closing app")

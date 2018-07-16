@@ -62,7 +62,7 @@ class OverlayThread(threading.Thread):
         for track in tracks:
             # May need to adjust this line to account for past path
             # Right now, looks at most recent
-            if full_track:
+            if full_track and len(track) > 2:
                 x, y = track[0]
                 coordinates.append((x, y))
 
@@ -97,11 +97,10 @@ class OverlayThread(threading.Thread):
         cv2.addWeighted(overlay, alpha, image, 1 - alpha, 0, image)
 
     def find_zone(self):
-        # print(self.lookup)
-        tran = np.transpose(self.lookup)
-        zones = np.split(tran, [3, 5])
+        zones = np.split(self.lookup, [3, 5])
+        # zones = np.delete(zones, 0, 1)
         self.scores = []
         for zone in zones:
             self.scores.append(np.sum(zone) / np.size(zone))
-        self.travel_zone = np.argmin(self.scores)
+        self.travel_zone = np.argmin(np.delete(self.scores, 1)) * 2
         self.lookup = np.zeros((self.reduction, self.reduction))
