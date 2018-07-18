@@ -42,15 +42,15 @@ class DroneData:
         # Creates queues. The first three are to communicate between the
         # threads. The last two are to output data after the program has
         # terminated.
-        self.frame_q = queue.Queue()
+        self.sensor_q = queue.Queue()
         self.analyze_q = queue.Queue()
         self.overlay_q = queue.Queue()
         self.screen_shots_q = queue.Queue()
         self.csv_q = queue.Queue()
 
         # Initializes threads and puts them into an array.
-        self.sensor = SensorThread(self.frame_q, name='pi_frame')
-        self.analyze = AnalyzeThread(self.frame_q, self.analyze_q,
+        self.sensor = SensorThread(self.sensor_q, name='pi_frame')
+        self.analyze = AnalyzeThread(self.sensor_q, self.analyze_q,
                                      name='analyze')
         self.overlay = OverlayThread(self.analyze_q, self.overlay_q,
                                      resolution=self.resolution,
@@ -109,7 +109,7 @@ class DroneData:
                 lidar_value, in_danger_zone = lidar
                 if self.verbose:
                     display = ['Total frames in frame_q: %d' %
-                               self.frame_q.qsize(),
+                               self.sensor_q.qsize(),
                                'Total frames in analyze_q: %d' %
                                self.analyze_q.qsize(),
                                'Total frames in overlay_q: %d' %

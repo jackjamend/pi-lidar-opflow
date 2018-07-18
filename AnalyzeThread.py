@@ -19,30 +19,29 @@ import numpy as np
 
 # Two parameters that affect the object detection. Adjusting these values
 # will be the next step in improving the algorithm.
-lk_params = dict( winSize  = (25, 25),
-                  maxLevel = 1,
-                  criteria = (cv2.TERM_CRITERIA_EPS |
-                              cv2.TERM_CRITERIA_COUNT, 10, 0.03))
-feature_params = dict( maxCorners = 50,
-                       qualityLevel = 0.5,
-                       minDistance = 10,
-                       blockSize = 5)
+lk_params = dict(winSize=(25, 25), maxLevel=1,
+                 criteria=(cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT,
+                           10, 0.03))
+feature_params = dict(maxCorners=50, qualityLevel=0.5, minDistance=10,
+                      blockSize=5)
 
 
 class AnalyzeThread(threading.Thread):
-    def __init__(self, frame_q: queue.Queue, analyze_q: queue.Queue,
+    def __init__(self, sensor_q: queue.Queue, analyze_q: queue.Queue,
                  name=None):
         """
+        Initializes the thread
         
-        :param frame_q: 
+        :param frame_q: queue with the frame and lidar information
         :param analyze_q: 
         :param name: 
         """
         super(AnalyzeThread, self).__init__(name=name)
         self.stop_request = threading.Event()
-        self.frame_q =  frame_q
+        self.sensor_q = sensor_q
         self.analyze_q = analyze_q
         self.prev_frame = None
+        self.prev_gray = None
 
         self.track_len = 5
         self.detect_interval = 10
@@ -51,8 +50,8 @@ class AnalyzeThread(threading.Thread):
 
     def run(self):
         while not self.stop_request.isSet():
-            if not self.frame_q.empty():
-                frame, lidar = self.frame_q.get()
+            if not self.sensor_q.empty():
+                frame, lidar = self.sensor_q.get()
                 frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
                 vis = frame.copy()
 
@@ -62,9 +61,10 @@ class AnalyzeThread(threading.Thread):
                                                                             1,
                                                                             2)
                     p1, _st, _err = cv2.calcOpticalFlowPyrLK(img0, img1, p0,
-                                                            None, **lk_params)
-                    p0r, _st, _err = cv2.calcOpticalFlowPyrLK(img1, img0, p1,
                                                              None, **lk_params)
+                    p0r, _st, _err = cv2.calcOpticalFlowPyrLK(img1, img0, p1,
+                                                              None,
+                                                              **lk_params)
                     d = abs(p0 - p0r).reshape(-1, 2).max(-1)
                     good = d < 1
                     new_tracks = []
@@ -96,8 +96,6 @@ class AnalyzeThread(threading.Thread):
                 self.prev_gray = frame_gray
 
                 self.analyze_q.put((vis, self.tracks, lidar))
-                # print('Analyze thread ran for %.2f seconds' %
-                #       (time.time()-start))
 
     def join(self, timeout=None):
         self.stop_request.set()
