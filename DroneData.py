@@ -22,22 +22,31 @@ from SensorThread import SensorThread
 
 
 class DroneData:
-    def __init__(self, resolution, reduction, show_image=False, verbose=False):
+    def __init__(self, resolution, reduction, threshold=100, show_image=False,
+                 verbose=False):
         """
         Initializes an instance of drone data class. Controller for the 
         threads.
          
-        :param resolution: a tuple of the number of pixels as height by width.
-        :param reduction: the factor to reduce the frame size by.
-        :param show_image: boolean that decides if image should be 
-        displayed. Should be set to fault if running program through ssh.
-        :param verbose: boolean that decides that output on the frame.
+        :param resolution:
+            a tuple of the number of pixels as height by width.
+        :param reduction: 
+            the factor to reduce the frame size by.
+        :param threshold: 
+            minimum distance for LiDAR to return that an object is within the 
+            danger zone. 
+        :param show_image: 
+            boolean that decides if image should be displayed. Should be set to 
+            fault if running program through ssh.
+        :param verbose: 
+            boolean that decides that output on the frame.
         """
         # Records variables given from constructor
         self.resolution = resolution
         self.reduction = reduction
-        self.verbose = verbose
+        self.threshold = threshold
         self.show_image = show_image
+        self.verbose = verbose
 
         # Creates queues. The first three are to communicate between the
         # threads. The last two are to output data after the program has
@@ -49,7 +58,8 @@ class DroneData:
         self.csv_q = queue.Queue()
 
         # Initializes threads and puts them into an array.
-        self.sensor = SensorThread(self.sensor_q, name='pi_frame')
+        self.sensor = SensorThread(self.sensor_q, threshold,
+                                   resolution, name='pi_frame')
         self.analyze = AnalyzeThread(self.sensor_q, self.analyze_q,
                                      name='analyze')
         self.overlay = OverlayThread(self.analyze_q, self.overlay_q,

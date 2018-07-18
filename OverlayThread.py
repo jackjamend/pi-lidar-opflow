@@ -1,3 +1,13 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Jun 15, 2018
+
+@author: Jack J Amend
+
+Inherits from the Thread class. Takes the information from the analyze 
+queue. The information is then taken and an overlay frame is created to 
+identify the regions where the points are located.
+"""
 import queue
 import threading
 
@@ -9,6 +19,22 @@ colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255)]
 class OverlayThread(threading.Thread):
     def __init__(self, analyze_q: queue.Queue, overlay_q: queue.Queue,
                  resolution, reduction, name=None):
+        """
+        Initializes an instance of an overlay thread. Checks list of points 
+        and creates a table that is then displayed as an overlay on the frame.
+        
+        :param analyze_q: 
+            queue that holds the frame, tracks, and lidar information.
+        :param overlay_q: 
+            queue that contains the overlay frame, the table with the 
+            points, the scores for each zone, and the LiDAR data.
+        :param resolution: 
+            a tuple of the number of pixels as height by width.
+        :param reduction: 
+            the factor to reduce the frame size by.
+        :param name: 
+            name of the thread.
+        """
         super(OverlayThread, self).__init__(name=name)
         self.stop_request = threading.Event()
         self.analyze_q = analyze_q
@@ -23,7 +49,6 @@ class OverlayThread(threading.Thread):
         self.scores = []
 
     def run(self):
-
         while not self.stop_request.isSet():
             while not self.analyze_q.empty():
                 # start = time.time()

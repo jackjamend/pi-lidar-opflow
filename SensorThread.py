@@ -15,10 +15,24 @@ from picamera import PiCamera
 from picamera.array import PiRGBArray
 
 
-
 class SensorThread(threading.Thread):
-    def __init__(self, frame_q: queue.Queue,
-                 resolution=(640, 480), framerate=32, name=None):
+    def __init__(self, sensor_q: queue.Queue, threshold, resolution=(640, 480),
+                 framerate=32, name=None):
+        """
+        Initializes an instance of a sensor thread. Thread records sensor 
+        information.
+        
+        :param sensor_q: 
+            queue that saves the sensor data.
+        :param threshold: 
+            minimum distance required for drone to be in the danger zone. 
+        :param resolution: 
+            a tuple of the number of pixels as height by width.
+        :param framerate: 
+            frame rate required parameter for the PiCamera.
+        :param name: 
+            name of the thread.
+        """
         super(SensorThread, self).__init__(name=name)
         self.stop_request = threading.Event()
 
@@ -27,11 +41,11 @@ class SensorThread(threading.Thread):
         self.camera.resolution = resolution
         self.camera.framerate = framerate
         self.rawCapture = PiRGBArray(self.camera, size=resolution)
-        self.frame_q = frame_q
+        self.sensor_q = sensor_q
 
         # LiDAR
         self.lidar = self._setup_lidar()
-        self.lidar_threshold = 100
+        self.lidar_threshold = threshold
         self.current_value = None
         self.in_danger_zone = False
 
@@ -47,8 +61,8 @@ class SensorThread(threading.Thread):
                     self.in_danger_zone = True
                 else:
                     self.in_danger_zone = False
-                self.frame_q.put((frame, (self.current_value,
-                                  self.in_danger_zone)))
+                self.sensor_q.put((frame, (self.current_value,
+                                           self.in_danger_zone)))
                 self.rawCapture.truncate(0)
 
     def join(self, timeout=None):
@@ -57,12 +71,17 @@ class SensorThread(threading.Thread):
 
     def _setup_lidar(self):
         """
+        Creates a LiDAR object from the file and checks to see if it is 
+        connected.
         
+        :raise Exception: 
+            raises an exception if LiDAR is not connected
         :return: 
+            LiDAR object
         """
         from lidar_lite import Lidar_Lite as lidar
         lidar = lidar()
         connect = lidar.connect(1)
-        if connect <-1:
+        if connect < -1:
             raise Exception("No LiDAR found")
         return lidar

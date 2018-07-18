@@ -30,11 +30,15 @@ class AnalyzeThread(threading.Thread):
     def __init__(self, sensor_q: queue.Queue, analyze_q: queue.Queue,
                  name=None):
         """
-        Initializes the thread
+        Initializes the thread. Responsible for finding points and tracking 
+        them.
         
-        :param frame_q: queue with the frame and lidar information
+        :param sensor_q: 
+            queue with the frame and LiDAR information.
         :param analyze_q: 
+            queue where frame, tracks, and LiDAR information is recorded.
         :param name: 
+            name of the thread.
         """
         super(AnalyzeThread, self).__init__(name=name)
         self.stop_request = threading.Event()
