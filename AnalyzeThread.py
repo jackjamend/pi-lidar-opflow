@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Created on Fri Jun 15, 2018
 
@@ -71,8 +72,7 @@ class AnalyzeThread(threading.Thread):
                         cv2.circle(vis, (x, y), 2, (0, 255, 0), -1)
                     self.tracks = new_tracks
                     cv2.polylines(vis, [np.int32(tr) for tr in self.tracks],
-                                 False, (0, 255, 0))
-
+                                  False, (0, 255, 0))
 
                 if self.frame_idx % self.detect_interval == 0:
                     mask = np.zeros_like(frame_gray)

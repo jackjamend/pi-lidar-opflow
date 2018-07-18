@@ -36,6 +36,7 @@ class DroneData:
         self.overlay = OverlayThread(self.analyze_q, self.overlay_q,
                                      resolution=self.resolution,
                                      reduction=self.reduction, name='overlay')
+
         self.threads = [self.sensor, self.analyze, self.overlay]
         for thread in self.threads:
             thread.setDaemon(True)
@@ -193,4 +194,3 @@ class DroneData:
             thread.join(5)
             print('Thread %s closed!' % thread.getName(), flush=True)
         print('Closed!')
-
