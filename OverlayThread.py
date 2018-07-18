@@ -27,9 +27,9 @@ class OverlayThread(threading.Thread):
         while not self.stop_request.isSet():
             while not self.analyze_q.empty():
                 # start = time.time()
-                frame, tracks = self.analyze_q.get()
+                frame, tracks, lidar = self.analyze_q.get()
                 output = self.image_with_boxes(frame, tracks, show_image=False)
-                self.overlay_q.put((output, self.lookup, self.scores))
+                self.overlay_q.put((output, self.lookup, self.scores, lidar))
                 self.find_zone()
                 self.history *= .95
                 # print('Overlay thread ran for %.2f seconds and %d tracks' %

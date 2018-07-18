@@ -1,12 +1,15 @@
-import numpy as np
+import time
+import datetime
+from termcolor import colored
+import queue
 
-arr = np.zeros((8,8))
-count = 0
-for i in range(len(arr)):
-    for j in range(len(arr[i])):
-        arr[i][j] = count
-        count +=1
+print(colored("Object outside of LiDAR threshold", 'red'))
+print(colored("Object outside of LiDAR threshold", 'green'))
 
+q = queue.Queue()
 
-print(arr)
-print(arr.flatten())
+q.put(('frame', (300,True)))
+
+frame, lidar = q.get()
+print(frame)
+print(lidar)

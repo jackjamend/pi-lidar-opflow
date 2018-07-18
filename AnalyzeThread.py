@@ -34,7 +34,7 @@ class AnalyzeThread(threading.Thread):
         while not self.stop_request.isSet():
             if not self.frame_q.empty():
                 # start = time.time()
-                frame = self.frame_q.get()
+                frame, lidar = self.frame_q.get()
                 frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
                 vis = frame.copy()
                 # vis = self.fgbg.apply(frame)
@@ -79,7 +79,7 @@ class AnalyzeThread(threading.Thread):
                 self.frame_idx += 1
                 self.prev_gray = frame_gray
 
-                self.analyze_q.put((vis, self.tracks))
+                self.analyze_q.put((vis, self.tracks, lidar))
                 # print('Analyze thread ran for %.2f seconds' %
                 #       (time.time()-start))
 
