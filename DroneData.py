@@ -1,19 +1,38 @@
-import queue
-import time
-import cv2
-import numpy as np
-import os
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Jun 15, 2018
+
+@author: Jack J Amend
+
+ 
+"""
 import csv
 import datetime
+import time
+import os
+import queue
+
+import cv2
+import numpy as np
 from termcolor import colored
 
-from SensorThread import SensorThread
 from AnalyzeThread import AnalyzeThread
 from OverlayThread import OverlayThread
+from SensorThread import SensorThread
 
 
 class DroneData:
     def __init__(self, resolution, reduction, show_image=False, verbose=False):
+        """
+        Initializes an instance of drone data class. Controller for the 
+        threads.
+         
+        :param resolution: a tuple of the number of pixels as height by width.
+        :param reduction: the factor to reduce the frame size by.
+        :param show_image: boolean that decides if image should be 
+        displayed. Should be set to fault if running program through ssh.
+        :param verbose: boolean that decides that output on the frame.
+        """
         # Records variables given from constructor
         self.resolution = resolution
         self.reduction = reduction
@@ -57,17 +76,21 @@ class DroneData:
         self.scores = []
 
     def _setup(self):
-        """Creates a directory from the current location called data with a 
+        """
+        Creates a directory from the current location called data with a 
         sub-directory called screen-shots. This is where the data will be 
         saved. If a directory with the same name already exists, 
         the directory will not be deleted, instead the information will be 
-        written into the folder."""
+        written into the folder.
+        """
         os.popen('mkdir -p %s' % self.image_folder_path)
         os.popen('touch ' + self.csv_file)
 
     def run(self):
-        """Runs the program. Starts the threads and then begins processing 
-        data"""
+        """
+        Runs the program. Starts the threads and then begins processing 
+        data
+        """
         for thread in self.threads:
             thread.start()
             time.sleep(.1)
@@ -163,14 +186,18 @@ class DroneData:
                 break
 
     def close(self):
-        """Calls methods to close the program"""
+        """
+        Calls methods to close the program
+        """
         self._write_file()
         self._kill_threads()
 
     def _write_file(self):
-        """Writes information from saved queues to the CSV file created 
+        """
+        Writes information from saved queues to the CSV file created 
         earlier and then saves the screen shots to the /data/screen-shot 
-        directory."""
+        directory.
+        """
         print('writing csv file...')
         while not self.csv_q.empty():
             self.writer.writerow(self.csv_q.get())
@@ -188,7 +215,9 @@ class DroneData:
         print('All images saved!')
 
     def _kill_threads(self):
-        """Kills all the threads in the program."""
+        """
+        Kills all the threads in the program.
+        """
         print('Closing threads...')
         for thread in self.threads:
             thread.join(5)

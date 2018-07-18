@@ -11,8 +11,9 @@ data are put in the next queue. The analyzing of the frames is adapted from
 a program posted on the OpenCV github page:
 (https://github.com/opencv/opencv/blob/master/samples/python/lk_track.py).
 """
-import threading
 import queue
+import threading
+
 import cv2
 import numpy as np
 
@@ -31,6 +32,12 @@ feature_params = dict( maxCorners = 50,
 class AnalyzeThread(threading.Thread):
     def __init__(self, frame_q: queue.Queue, analyze_q: queue.Queue,
                  name=None):
+        """
+        
+        :param frame_q: 
+        :param analyze_q: 
+        :param name: 
+        """
         super(AnalyzeThread, self).__init__(name=name)
         self.stop_request = threading.Event()
         self.frame_q =  frame_q

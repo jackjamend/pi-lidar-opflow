@@ -8,10 +8,12 @@ Inherits from the Thread class. Takes the current sensor information and
 places it into a given queue that is provided during initialization. This 
 thread class assumes that the camera being used is a PiCamera. 
 """
-import threading
 import queue
-from picamera.array import PiRGBArray
+import threading
+
 from picamera import PiCamera
+from picamera.array import PiRGBArray
+
 
 
 class SensorThread(threading.Thread):
@@ -54,6 +56,10 @@ class SensorThread(threading.Thread):
         super(SensorThread, self).join(timeout)
 
     def _setup_lidar(self):
+        """
+        
+        :return: 
+        """
         from lidar_lite import Lidar_Lite as lidar
         lidar = lidar()
         connect = lidar.connect(1)

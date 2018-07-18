@@ -1,5 +1,6 @@
-import threading
 import queue
+import threading
+
 import cv2
 import numpy as np
 colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255)]
