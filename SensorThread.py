@@ -1,14 +1,23 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Jun 15, 2018
+
+@author: Jack J Amend
+
+Inherits from the Thread class. Takes the current sensor information and 
+places it into a given queue that is provided during initialization. This 
+thread class assumes that the camera being used is a PiCamera. 
+"""
 import threading
 import queue
-import time
 from picamera.array import PiRGBArray
 from picamera import PiCamera
 
 
-class PiFrameThread(threading.Thread):
+class SensorThread(threading.Thread):
     def __init__(self, frame_q: queue.Queue,
                  resolution=(640, 480), framerate=32, name=None):
-        super(PiFrameThread, self).__init__(name=name)
+        super(SensorThread, self).__init__(name=name)
         self.stop_request = threading.Event()
         # Camera
         self.camera = PiCamera()
@@ -17,7 +26,7 @@ class PiFrameThread(threading.Thread):
         self.rawCapture = PiRGBArray(self.camera, size=resolution)
         self.frame_q = frame_q
         # LiDAR
-        self.lidar = self.setup_lidar(100)
+        self.lidar = self._setup_lidar(100)
         self.current_value = None
         self.in_danger_zone = False
 
@@ -39,9 +48,9 @@ class PiFrameThread(threading.Thread):
 
     def join(self, timeout=None):
         self.stop_request.set()
-        super(PiFrameThread, self).join(timeout)
+        super(SensorThread, self).join(timeout)
 
-    def setup_lidar(self, threshold):
+    def _setup_lidar(self, threshold):
         from lidar_lite import Lidar_Lite as lidar
         lidar = lidar()
         connect = lidar.connect(1)

@@ -1,9 +1,22 @@
+"""
+Created on Fri Jun 15, 2018
+
+@author: Jack J Amend
+
+Inherits from the Thread class. Takes sensor information from queue and 
+analyzes the frame. Optical flow is performed on the frame and points are 
+tracked on the frame. The new frame, list of point tracks, and lidar sensor 
+data are put in the next queue. The analyzing of the frames is adapted from 
+a program posted on the OpenCV github page:
+(https://github.com/opencv/opencv/blob/master/samples/python/lk_track.py).
+"""
 import threading
 import queue
 import cv2
-import time
 import numpy as np
 
+# Two parameters that affect the object detection. Adjusting these values
+# will be the next step in improving the algorithm.
 lk_params = dict( winSize  = (25, 25),
                   maxLevel = 1,
                   criteria = (cv2.TERM_CRITERIA_EPS |
@@ -15,7 +28,6 @@ feature_params = dict( maxCorners = 50,
 
 
 class AnalyzeThread(threading.Thread):
-
     def __init__(self, frame_q: queue.Queue, analyze_q: queue.Queue,
                  name=None):
         super(AnalyzeThread, self).__init__(name=name)
@@ -28,16 +40,13 @@ class AnalyzeThread(threading.Thread):
         self.detect_interval = 10
         self.tracks = []
         self.frame_idx = 0
-        # self.fgbg = cv2.bgsegm.createBackgroundSubtractorMOG()
 
     def run(self):
         while not self.stop_request.isSet():
             if not self.frame_q.empty():
-                # start = time.time()
                 frame, lidar = self.frame_q.get()
                 frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
                 vis = frame.copy()
-                # vis = self.fgbg.apply(frame)
 
                 if len(self.tracks) > 0:
                     img0, img1 = self.prev_gray, frame_gray

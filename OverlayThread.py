@@ -1,7 +1,6 @@
 import threading
 import queue
 import cv2
-import time
 import numpy as np
 colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255)]
 
@@ -28,10 +27,12 @@ class OverlayThread(threading.Thread):
             while not self.analyze_q.empty():
                 # start = time.time()
                 frame, tracks, lidar = self.analyze_q.get()
+                _, danger_zone = lidar
                 output = self.image_with_boxes(frame, tracks, show_image=False)
                 self.overlay_q.put((output, self.lookup, self.scores, lidar))
-                self.find_zone()
-                self.history *= .95
+                if danger_zone:
+                    self.find_zone()
+                    self.history *= .95
                 # print('Overlay thread ran for %.2f seconds and %d tracks' %
                 #       ((time.time()-start), len(tracks)))
 
