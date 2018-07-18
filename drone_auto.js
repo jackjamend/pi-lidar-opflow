@@ -1,5 +1,5 @@
 const spawn = require('child_process').spawn;
-const py = spawn('python3', ['Controller.py']);
+const py = spawn('python3', ['DroneDetection.py']);
 
 const speed = 0.1;
 var ev = '';
