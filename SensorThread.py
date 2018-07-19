@@ -50,6 +50,11 @@ class SensorThread(threading.Thread):
         self.in_danger_zone = False
 
     def run(self):
+        """
+        Runs thread while stop request is not set. Reads in images from the 
+        PiCamera and the LiDAR at the current time and puts it into the 
+        sensor queue to be processed by the analyze thread.
+        """
         while not self.stop_request.isSet():
             for image in self.camera.capture_continuous(self.rawCapture,
                                                         format="bgr",
@@ -66,6 +71,11 @@ class SensorThread(threading.Thread):
                 self.rawCapture.truncate(0)
 
     def join(self, timeout=None):
+        """
+       Joins the thread.
+       :param timeout: 
+           time until timeout of attempting to join thread 
+       """
         self.stop_request.set()
         super(SensorThread, self).join(timeout)
 

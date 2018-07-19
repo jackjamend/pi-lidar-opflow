@@ -14,6 +14,10 @@ from DroneData import DroneData
 
 
 def main():
+    """
+    Driver of the program. Starts the DroneData object for object detection 
+    for a UAV.
+    """
     drone_data = None
     try:
         picamera_frame_size = (640, 480)

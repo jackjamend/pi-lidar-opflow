@@ -53,6 +53,11 @@ class AnalyzeThread(threading.Thread):
         self.frame_idx = 0
 
     def run(self):
+        """
+        Runs thread while stop request is not set. Takes frame information 
+        from sensor queue and performs optical flow on the frame to then pass 
+        it to the overlay queue.
+        """
         while not self.stop_request.isSet():
             if not self.sensor_q.empty():
                 frame, lidar = self.sensor_q.get()
@@ -102,5 +107,10 @@ class AnalyzeThread(threading.Thread):
                 self.analyze_q.put((vis, self.tracks, lidar))
 
     def join(self, timeout=None):
+        """
+       Joins the thread.
+       :param timeout: 
+           time until timeout of attempting to join thread. 
+        """
         self.stop_request.set()
         super(AnalyzeThread, self).join(timeout)

@@ -49,6 +49,12 @@ class OverlayThread(threading.Thread):
         self.scores = []
 
     def run(self):
+        """
+        Runs thread while stop request if not set. Takes frame and track 
+        information from the analyze queue and runs an analysis on to find 
+        out which smaller frames are occupied. Processed information is then 
+        passed to the overlay queue for the main thread to process.
+        """
         while not self.stop_request.isSet():
             while not self.analyze_q.empty():
                 # start = time.time()
@@ -58,12 +64,15 @@ class OverlayThread(threading.Thread):
                                                 show_image=False)
                 self.overlay_q.put((output, self.lookup, self.scores, lidar))
                 if danger_zone:
-                    self.find_zone()
+                    self._find_zone()
                     self.history *= .95
-                # print('Overlay thread ran for %.2f seconds and %d tracks' %
-                #       ((time.time()-start), len(tracks)))
 
     def join(self, timeout=None):
+        """
+        Joins the thread.
+        :param timeout: 
+            time until timeout of attempting to join thread 
+        """
         self.stop_request.set()
         super(OverlayThread, self).join(timeout)
 
@@ -85,8 +94,6 @@ class OverlayThread(threading.Thread):
 
     def _get_coordinates_of_corners(self, tracks, full_track=True):
         coordinates = []
-        '''Changed good_tracks from self.tracks'''
-        # good_tracks = self.good_tracks()
         for track in tracks:
             # May need to adjust this line to account for past path
             # Right now, looks at most recent
