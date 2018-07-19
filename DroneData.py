@@ -151,7 +151,7 @@ class DroneData:
                     except cv2.error:
                         pass
 
-            # Condition checks if the lidar reported that the drone is
+            # Condition checks if the LiDAR reported that the drone is
             # within the safety zone and if the drone was previously in
             # the safety zone
             if in_danger_zone and not self.passed_safety_zone and\
@@ -172,8 +172,8 @@ class DroneData:
                                 self.overlay.travel_zone, self.scores,
                                 np.transpose(self.lookup).flatten()))
 
-            # Checks if the the drone was previosuly not in the safet zone
-            # and the lidar is no longer reporting there is an object in the
+            # Checks if the the drone was previously not in the safety zone
+            # and the LiDAR is no longer reporting there is an object in the
             #  danger zone
             elif self.passed_safety_zone and not in_danger_zone:
                 print(colored("Object outside of LiDAR threshold\n", 'green'))

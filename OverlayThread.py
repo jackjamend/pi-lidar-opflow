@@ -54,7 +54,8 @@ class OverlayThread(threading.Thread):
                 # start = time.time()
                 frame, tracks, lidar = self.analyze_q.get()
                 _, danger_zone = lidar
-                output = self.image_with_boxes(frame, tracks, show_image=False)
+                output = self._image_with_boxes(frame, tracks,
+                                                show_image=False)
                 self.overlay_q.put((output, self.lookup, self.scores, lidar))
                 if danger_zone:
                     self.find_zone()
@@ -68,21 +69,21 @@ class OverlayThread(threading.Thread):
 
     '''Analyze the image to overlay with boxes'''
 
-    def image_with_boxes(self, image, tracks, show_image=True):
+    def _image_with_boxes(self, image, tracks, show_image=True):
         # If there are no points to track, return
         if len(tracks) <= 0:
             return
         new_image = image.copy()
 
         # finds corners and retrieves x y points
-        corner_coordinates = self.get_coordinates_of_corners(tracks)
-        self.create_fill_in_array(corner_coordinates)
-        self.overlay_image(new_image)
+        corner_coordinates = self._get_coordinates_of_corners(tracks)
+        self._create_fill_in_array(corner_coordinates)
+        self._overlay_image(new_image)
         if show_image:
             cv2.imshow('Show image option window', new_image)
         return new_image
 
-    def get_coordinates_of_corners(self, tracks, full_track=True):
+    def _get_coordinates_of_corners(self, tracks, full_track=True):
         coordinates = []
         '''Changed good_tracks from self.tracks'''
         # good_tracks = self.good_tracks()
@@ -97,7 +98,7 @@ class OverlayThread(threading.Thread):
             coordinates.append((x, y))
         return coordinates
 
-    def create_fill_in_array(self, points):
+    def _create_fill_in_array(self, points):
         width, height = self.dx, self.dy
 
         for point in points:
@@ -108,7 +109,7 @@ class OverlayThread(threading.Thread):
                 self.lookup[x_sector][y_sector] += 1
                 self.history[x_sector][y_sector] += 1
 
-    def overlay_image(self, image):
+    def _overlay_image(self, image):
         overlay = image.copy()
         for index, x in np.ndenumerate(self.lookup):
             top_x = index[0] * (self.resolution[0] // self.reduction)
@@ -123,7 +124,7 @@ class OverlayThread(threading.Thread):
         alpha = .4
         cv2.addWeighted(overlay, alpha, image, 1 - alpha, 0, image)
 
-    def find_zone(self):
+    def _find_zone(self):
         zones = np.split(self.lookup, [3, 5])
         # zones = np.delete(zones, 0, 1)
         self.scores = []
